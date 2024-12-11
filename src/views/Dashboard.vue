@@ -19,7 +19,7 @@
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
-                <h5 class=" fw-normal">Total Devices</h5>
+                <h5 class="fw-normal">Total Devices</h5>
                 <p class="card-text">{{ totalDevices }}</p>
               </div>
             </div>
@@ -27,7 +27,7 @@
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
-                <h5 class=" fw-normal">Total Active</h5>
+                <h5 class="fw-normal">Total Active</h5>
                 <p class="card-text">{{ totalActive }}</p>
               </div>
             </div>
@@ -35,7 +35,7 @@
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
-                <h5 class=" fw-normal">Total Inactive</h5>
+                <h5 class="fw-normal">Total Inactive</h5>
                 <p class="card-text">{{ totalInactive }}</p>
               </div>
             </div>
@@ -43,7 +43,7 @@
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
-                <h5 class=" fw-normal">Total On</h5>
+                <h5 class="fw-normal">Total On</h5>
                 <p class="card-text">{{ totalOn }}</p>
               </div>
             </div>
@@ -51,7 +51,7 @@
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
-                <h5 class=" fw-normal">Total Off</h5>
+                <h5 class="fw-normal">Total Off</h5>
                 <p class="card-text">{{ totalOff }}</p>
               </div>
             </div>
@@ -60,7 +60,7 @@
       </div>
     </div>
 
-    <div class="container-fluid ">
+    <div class="container-fluid">
       <div class="row">
         <div class="col-8">
           <div class="row mb-4">
@@ -162,7 +162,7 @@
             </div>
           </div>
         </div>
-        <div class="col ">
+        <div class="col">
           <!-- Log -->
           <div class="col" style="max-height: 700px; overflow-y: auto">
             <div class="card">
@@ -186,12 +186,10 @@
         </div>
       </div>
     </div>
-    
+
+    <!-- Third Row: Map Section -->
     <div class="container-fluid">
-        <h3>Map</h3>
-        <div class="border border-danger p-5">
-            
-        </div>
+      <MapComponent :devices="bulbs"/>
     </div>
 
     <div>
@@ -370,6 +368,7 @@
 import { onMounted, ref, computed } from "vue";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
+import MapComponent from "../components/MapComponent.vue"; // Import MapComponent
 
 const bulbs = ref([]);
 const logs = ref([]);
@@ -384,12 +383,6 @@ const selectedDevice = ref({});
 
 const openUpdateModal = (device) => {
   selectedDevice.value = { ...device }; // Clone the device object
-};
-
-const closeModal = (modalId) => {
-  const modalElement = document.getElementById(modalId);
-  const modal = bootstrap.Modal.getInstance(modalElement); // Get the modal instance
-  if (modal) modal.hide();
 };
 
 // Update device details

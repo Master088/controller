@@ -9,7 +9,16 @@
             <div class="col-12 col-md-6 col-xl-7">
               <div class="d-flex justify-content-center text-bg-primary">
                 <div class="col-12 col-xl-9">
-                  img here 💡💡💡
+                  <div class="text-center mb-3">
+                        <i
+                          class="fas fa-lightbulb"
+                          :style="{
+                            color:
+                              'yellow',
+                            fontSize: '60px',
+                          }"
+                        ></i>
+                      </div>
                   <!-- <img
                     class="img-fluid rounded mb-4"
                     loading="lazy"
