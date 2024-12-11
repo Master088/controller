@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="d-flex justify-content-between w-100">
         <!-- Hamburger button for mobile view (optional) -->
-        <button
+        <!-- <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
@@ -13,12 +13,19 @@
           aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
-        </button>
+        </button> -->
+        
 
         <!-- User profile section aligned to the right -->
         <div class="d-flex align-items-center ms-auto">
+            <button
+                class="dropdown-item text-danger"
+                @click="signOut"
+              >
+                Sign out
+              </button>
           <!-- Dropdown button -->
-          <button
+          <!-- <button
             class="btn btn-link dropdown-toggle"
             type="button"
             id="userMenuButton"
@@ -32,10 +39,10 @@
               width="40"
               height="40"
             />
-          </button>
+          </button> -->
 
           <!-- Dropdown menu -->
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
+          <!-- <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenuButton">
             <li>
               <a class="dropdown-item" href="#">
                 <strong>{{ user?.displayName }}</strong>
@@ -57,7 +64,7 @@
                 Sign out
               </button>
             </li>
-          </ul>
+          </ul> -->
         </div>
       </div>
     </div>
