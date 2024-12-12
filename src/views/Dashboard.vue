@@ -189,7 +189,8 @@
 
     <!-- Third Row: Map Section -->
     <div class="container-fluid">
-      <MapComponent :devices="bulbs"/>
+      <div id="map"></div>  
+
     </div>
 
     <div>
@@ -369,6 +370,9 @@ import { onMounted, ref, computed } from "vue";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
 import MapComponent from "../components/MapComponent.vue"; // Import MapComponent
+import L from 'leaflet'; // Import Leaflet
+import 'leaflet/dist/leaflet.css'; // Leaflet CSS
+import '@fortawesome/fontawesome-free/css/all.min.css'; // Font Awesome CSS
 
 const bulbs = ref([]);
 const logs = ref([]);
@@ -473,8 +477,50 @@ onMounted(() => {
     for (let id in logsData) {
       logs.value.push({ id, ...logsData[id] });
     }
+    console.log(" bulbs", bulbs.value) 
+
+    initializeMapMarker(bulbs.value)
   });
 });
+
+
+const initializeMapMarker = (data) => {
+
+console.log("data11111111",data)
+const clsuCoordinates = [15.7301769, 120.9298825]; // CLSU coordinates
+const map = L.map('map').setView(clsuCoordinates, 17); // Initialize map
+
+// Add OpenStreetMap tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+}).addTo(map);
+
+// Custom icons
+const redIcon = L.divIcon({
+  className: 'fa-2x',
+  html: '<i class="fas fa-map-marker-alt" style="color:red;"></i>',
+  iconSize: [40, 40],
+});
+
+// Place markers for each bulb in data
+data.forEach((bulb) => {
+  console.log("here",bulb )
+  if (bulb.latitude && bulb.longitude) {
+  
+    L.marker([bulb.latitude, bulb.longitude], { icon: redIcon })
+      .addTo(map)
+      .bindPopup(`<b>${bulb.name || 'Bulb'}</b><br>Status: ${bulb.status || 'N/A'}`);
+  }
+});
+
+
+map.on('click', function (e) {
+  const { lat, lng } = e.latlng;
+  L.marker([lat, lng], { icon: redIcon }).addTo(map);
+});
+};
+
+
 
 // Computed properties for counts
 const totalDevices = computed(() => bulbs.value.length);
@@ -506,10 +552,16 @@ const toggleStatus = (device) => {
 </script>
 
 <style scoped>
-html,
-body,
-#map-container {
-  height: 100%;
-  margin: 0;
-}
+  html, body, #map-container {
+    height: 100%;  /* Full height of the viewport */
+    margin: 0;     /* Remove default margins */
+  }
+
+  .container-fluid {
+    padding: 0;
+  }
+  #map {
+    height: 100vh;
+    width: 100%;
+  }
 </style>
