@@ -5,7 +5,8 @@
         <h3>Dashboard</h3>
         <button
           type="button"
-          class="btn btn-success"
+          class="btn px-4"
+          style="background-color: #1a2d4a; color: white"
           data-bs-toggle="modal"
           data-bs-target="#addDeviceModal"
         >
@@ -62,7 +63,7 @@
 
     <div class="container-fluid">
       <div class="row">
-        <div class="col-8">
+        <div class="col-9">
           <div class="row mb-4">
             <div>
               <!-- Device Cards -->
@@ -72,7 +73,7 @@
                   v-for="device in bulbs"
                   :key="device.id"
                 >
-                  <div class="card">
+                  <div class="card border-0 card-device">
                     <div class="card-body position-relative">
                       <div class="text-center mb-3">
                         <i
@@ -120,7 +121,7 @@
                       <div class="position-absolute top-0 end-0">
                         <div class="dropdown">
                           <button
-                            class="btn btn-sm btn-light"
+                            class="btn btn-sm btn-white p-3"
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
@@ -165,7 +166,7 @@
         <div class="col">
           <!-- Log -->
           <div class="col" style="max-height: 700px; overflow-y: auto">
-            <div class="card">
+            <div class="card border-0 shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">Device Log</h5>
                 <ul class="list-group list-group-flush">
@@ -188,9 +189,8 @@
     </div>
 
     <!-- Third Row: Map Section -->
-    <div class="container-fluid">
-      <div id="map"></div>  
-
+    <div class="container-fluid mt-5">
+      <div id="map"></div>
     </div>
 
     <div>
@@ -271,7 +271,6 @@
                     id="latitude"
                     class="form-control"
                     v-model="newDevice.latitude"
-                    placeholder="Optional"
                   />
                 </div>
                 <div class="mb-3">
@@ -281,10 +280,13 @@
                     id="longitude"
                     class="form-control"
                     v-model="newDevice.longitude"
-                    placeholder="Optional"
                   />
                 </div>
-                <button type="submit" class="btn btn-success">
+                <button
+                  type="submit"
+                  class="btn"
+                  style="background-color: #1a2d4a; color: white"
+                >
                   Add Device
                 </button>
               </form>
@@ -353,7 +355,29 @@
                     <option value="Inactive">Inactive</option>
                   </select>
                 </div>
-                <button type="submit" class="btn btn-primary">
+                <div class="mb-3">
+                  <label for="latitude" class="form-label">Latitude</label>
+                  <input
+                    type="text"
+                    id="latitude"
+                    class="form-control"
+                    v-model="selectedDevice.latitude"
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="longitude" class="form-label">Longitude</label>
+                  <input
+                    type="text"
+                    id="longitude"
+                    class="form-control"
+                    v-model="selectedDevice.longitude"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  class="btn"
+                  style="background-color: #1a2d4a; color: white"
+                >
                   Update Device
                 </button>
               </form>
@@ -370,9 +394,9 @@ import { onMounted, ref, computed } from "vue";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
 import MapComponent from "../components/MapComponent.vue"; // Import MapComponent
-import L from 'leaflet'; // Import Leaflet
-import 'leaflet/dist/leaflet.css'; // Leaflet CSS
-import '@fortawesome/fontawesome-free/css/all.min.css'; // Font Awesome CSS
+import L from "leaflet"; // Import Leaflet
+import "leaflet/dist/leaflet.css"; // Leaflet CSS
+import "@fortawesome/fontawesome-free/css/all.min.css"; // Font Awesome CSS
 
 const bulbs = ref([]);
 const logs = ref([]);
@@ -397,12 +421,15 @@ const updateDevice = async () => {
       name: selectedDevice.value.name,
       location: selectedDevice.value.location,
       status: selectedDevice.value.status,
+      latitude: selectedDevice.value.latitude,
+      longitude: selectedDevice.value.longitude,
     });
 
     // Close modal
     const modal = bootstrap.Modal.getInstance(
-      document.getElementById("updateDeviceModal")
+      document.getElementById("#update_device")
     );
+
     modal.hide();
 
     // Log success
@@ -477,50 +504,47 @@ onMounted(() => {
     for (let id in logsData) {
       logs.value.push({ id, ...logsData[id] });
     }
-    console.log(" bulbs", bulbs.value) 
+    console.log(" bulbs", bulbs.value);
 
-    initializeMapMarker(bulbs.value)
+    initializeMapMarker(bulbs.value);
   });
 });
 
-
 const initializeMapMarker = (data) => {
+  console.log("data11111111", data);
+  const clsuCoordinates = [15.7301769, 120.9298825]; // CLSU coordinates
+  const map = L.map("map").setView(clsuCoordinates, 17); // Initialize map
 
-console.log("data11111111",data)
-const clsuCoordinates = [15.7301769, 120.9298825]; // CLSU coordinates
-const map = L.map('map').setView(clsuCoordinates, 17); // Initialize map
+  // Add OpenStreetMap tile layer
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
 
-// Add OpenStreetMap tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+  // Custom icons
+  const redIcon = L.divIcon({
+    className: "fa-2x",
+    html: '<i class="fas fa-map-marker-alt" style="color:red;"></i>',
+    iconSize: [40, 40],
+  });
 
-// Custom icons
-const redIcon = L.divIcon({
-  className: 'fa-2x',
-  html: '<i class="fas fa-map-marker-alt" style="color:red;"></i>',
-  iconSize: [40, 40],
-});
+  // Place markers for each bulb in data
+  data.forEach((bulb) => {
+    console.log("here", bulb);
+    if (bulb.latitude && bulb.longitude) {
+      L.marker([bulb.latitude, bulb.longitude], { icon: redIcon })
+        .addTo(map)
+        .bindPopup(
+          `<b>${bulb.name || "Bulb"}</b><br>Status: ${bulb.status || "N/A"}`
+        );
+    }
+  });
 
-// Place markers for each bulb in data
-data.forEach((bulb) => {
-  console.log("here",bulb )
-  if (bulb.latitude && bulb.longitude) {
-  
-    L.marker([bulb.latitude, bulb.longitude], { icon: redIcon })
-      .addTo(map)
-      .bindPopup(`<b>${bulb.name || 'Bulb'}</b><br>Status: ${bulb.status || 'N/A'}`);
-  }
-});
-
-
-map.on('click', function (e) {
-  const { lat, lng } = e.latlng;
-  L.marker([lat, lng], { icon: redIcon }).addTo(map);
-});
+  map.on("click", function (e) {
+    const { lat, lng } = e.latlng;
+    L.marker([lat, lng], { icon: redIcon }).addTo(map);
+  });
 };
-
-
 
 // Computed properties for counts
 const totalDevices = computed(() => bulbs.value.length);
@@ -552,16 +576,22 @@ const toggleStatus = (device) => {
 </script>
 
 <style scoped>
-  html, body, #map-container {
-    height: 100%;  /* Full height of the viewport */
-    margin: 0;     /* Remove default margins */
-  }
+html,
+body,
+#map-container {
+  height: 100%; /* Full height of the viewport */
+  margin: 0; /* Remove default margins */
+}
 
-  .container-fluid {
-    padding: 0;
-  }
-  #map {
-    height: 100vh;
-    width: 100%;
-  }
+.container-fluid {
+  padding: 0;
+}
+#map {
+  height: 100vh;
+  width: 100%;
+}
+.card-device:hover {
+  box-shadow: 0 3px 10px #ebebeb;
+  transition: ease-in-out 0.2s;
+}
 </style>

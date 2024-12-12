@@ -1,16 +1,15 @@
 <!-- src/layouts/AuthLayout.vue -->
 <template>
-  <div>
+  <div style="background-color: #f5f5f5">
     <main>
       <router-view />
     </main>
-
   </div>
 </template>
 
 <script>
 export default {
-  name: 'AuthLayout',
+  name: "AuthLayout",
 };
 </script>
 

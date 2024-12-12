@@ -3,42 +3,33 @@
     <div
       class="d-flex justify-content-center align-items-center min-vh-100 bg-gradient"
     >
-      <section class="bg-primary py-3 px-5 py-md-5 py-xl-8 rounded-2">
+      <section
+        class="py-3 px-5 py-md-5 py-xl-8 rounded-2"
+        style="background-color: #1a2d4a"
+      >
         <div class="container">
           <div class="row gy-4 align-items-center">
             <div class="col-12 col-md-6 col-xl-7">
-              <div class="d-flex justify-content-center text-bg-primary">
-                <div class="col-12 col-xl-9">
-                  <div class="text-center mb-3">
-                        <i
-                          class="fas fa-lightbulb"
-                          :style="{
-                            color:
-                              'yellow',
-                            fontSize: '60px',
-                          }"
-                        ></i>
-                      </div>
-                  <!-- <img
+              <div class="d-flex">
+                <div class="col-12 col-xl-9 text-center">
+                  <img
                     class="img-fluid rounded mb-4"
                     loading="lazy"
-                    src="./assets/img/bsb-logo-light.svg"
-                    width="245"
-                    height="80"
-                    alt="BootstrapBrain Logo"
-                  /> -->
+                    src="../assets/undraw_date_night_bda8.svg"
+                  />
                   <hr class="border-primary-subtle mb-4" />
-                  <h2 class="h1 mb-4">
-                    Street Light Controller.
-                  </h2>
-                  <p class="lead mb-5">
-                    Efficient Lighting Management for Smarter Streets.
+                  <h2 class="h1 mb-2">Street Light Controller</h2>
+                  <p class="mb-5" style="color: #d9d9d9">
+                    Efficient Lighting Management for Smarter Streets
                   </p>
                 </div>
               </div>
             </div>
             <div class="col-12 col-md-6 col-xl-5">
-              <div class="card border-0 rounded-2">
+              <div
+                class="card border-0 rounded-2"
+                style="background-color: #f5f5f5"
+              >
                 <div class="card-body p-3 p-md-4 p-xl-5">
                   <div class="row">
                     <div class="col-12">
@@ -86,7 +77,11 @@
                         <div class="d-grid">
                           <button
                             type="submit"
-                            class="btn btn-primary btn-block"
+                            class="btn btn-block"
+                            style="
+                              background-color: #1a2d4a !important;
+                              color: white;
+                            "
                             :disabled="isLoading"
                           >
                             <span v-if="!isLoading">Log in</span>
