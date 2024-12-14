@@ -69,7 +69,7 @@
               <!-- Device Cards -->
               <div class="row">
                 <div
-                  class="col-md-4 mb-4"
+                  class="col-md-3 mb-4"
                   v-for="device in bulbs"
                   :key="device.id"
                 >
@@ -92,12 +92,12 @@
                           Status:
                           <span
                             :class="
-                              device.status === 'Active'
+                              device.active === true
                                 ? 'text-success'
                                 : 'text-danger'
                             "
                           >
-                            {{ device.status }}
+                            {{ device.active }}
                           </span>
                         </p>
                         <div class="form-check form-switch">
@@ -165,7 +165,7 @@
         </div>
         <div class="col">
           <!-- Log -->
-          <div class="col" style="max-height: 700px; overflow-y: auto">
+          <div class="col" style="max-height: 500px; overflow-y: auto">
             <div class="card border-0 shadow-sm">
               <div class="card-body">
                 <h5 class="card-title">Device Log</h5>
@@ -343,16 +343,16 @@
                 </div>
                 <div class="mb-3">
                   <label for="updateDeviceStatus" class="form-label"
-                    >Status</label
+                    >Active?</label
                   >
                   <select
-                    id="updateDeviceStatus"
+                    id="updateDeviceActive"
                     class="form-select"
-                    v-model="selectedDevice.status"
+                    v-model="selectedDevice.active"
                     required
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value=true>Active</option>
+                    <option value=false>Inactive</option>
                   </select>
                 </div>
                 <div class="mb-3">
@@ -393,10 +393,9 @@
 import { onMounted, ref, computed } from "vue";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
-import MapComponent from "../components/MapComponent.vue"; // Import MapComponent
-import L from "leaflet"; // Import Leaflet
-import "leaflet/dist/leaflet.css"; // Leaflet CSS
-import "@fortawesome/fontawesome-free/css/all.min.css"; // Font Awesome CSS
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const bulbs = ref([]);
 const logs = ref([]);
@@ -405,10 +404,10 @@ const logsRef = dbRef(db, "deviceLogs");
 
 // Selected device for update
 const selectedDevice = ref({});
+const map = ref(null); // Reference to the map
+const markersLayer = ref(null); // Layer group for markers
 
 // Open update modal and populate the fields
-// import { Modal } from 'bootstrap';
-
 const openUpdateModal = (device) => {
   selectedDevice.value = { ...device }; // Clone the device object
 };
@@ -416,23 +415,14 @@ const openUpdateModal = (device) => {
 // Update device details
 const updateDevice = async () => {
   try {
-    // Update Firebase
     await update(dbRef(db, `bulbs/${selectedDevice.value.id}`), {
       name: selectedDevice.value.name,
       location: selectedDevice.value.location,
-      status: selectedDevice.value.status,
+      active: selectedDevice.value.active=="true"?true:false ,
       latitude: selectedDevice.value.latitude,
       longitude: selectedDevice.value.longitude,
     });
 
-    // Close modal
-    const modal = bootstrap.Modal.getInstance(
-      document.getElementById("#update_device")
-    );
-
-    modal.hide();
-
-    // Log success
     console.log("Device updated successfully!");
   } catch (error) {
     console.error("Error updating device:", error);
@@ -443,10 +433,7 @@ const updateDevice = async () => {
 const deleteDevice = async (deviceId) => {
   if (confirm("Are you sure you want to delete this device?")) {
     try {
-      // Remove from Firebase
       await remove(dbRef(db, `bulbs/${deviceId}`));
-
-      // Log success
       console.log("Device deleted successfully!");
     } catch (error) {
       console.error("Error deleting device:", error);
@@ -459,43 +446,86 @@ const newDevice = ref({
   name: "",
   location: "",
   status: "Active",
-  relay_status: "On",
+  relay_status: "Off",
   active: true,
   latitude: "",
   longitude: "",
 });
 
-// Method to add new device
+// Add new device
 const addDevice = async () => {
   try {
-    // Push the new device to Firebase
     const newDeviceRef = await push(bulbsRef, { ...newDevice.value });
-
-    // Log success message
     console.log("New device added with ID:", newDeviceRef.key);
-
-    // Reset form fields
     Object.assign(newDevice.value, {
       name: "",
       location: "",
       status: "Active",
-      relay_status: "On",
+      relay_status: "Off",
       active: true,
       latitude: "",
       longitude: "",
     });
+ 
+  
+
   } catch (error) {
     console.error("Error adding new device:", error);
   }
 };
 
+// Initialize map and markers
+const initializeMap = () => {
+  const clsuCoordinates = [15.7301769, 120.9298825]; // CLSU coordinates
+  map.value = L.map("map").setView(clsuCoordinates, 17);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map.value);
+
+  markersLayer.value = L.layerGroup().addTo(map.value); // Layer for markers
+};
+
+const updateMapMarkers = (data) => {
+  markersLayer.value.clearLayers(); // Clear existing markers
+
+// Define the icon size
+const iconSize = [40, 40];
+
+data.forEach((bulb) => {
+  if (bulb.latitude && bulb.longitude) {
+    // Determine the color based on status
+    const markerColor = bulb.status === "Active" ? "green" : "red";
+
+    // Create the icon with the dynamic color
+    const markerIcon = L.divIcon({
+      className: "fa-2x",
+      html: `<i class="fas fa-map-marker-alt" style="color:${markerColor};"></i>`,
+      iconSize: iconSize,
+    });
+
+    // Add the marker to the map with the custom icon
+    L.marker([bulb.latitude, bulb.longitude], { icon: markerIcon })
+      .addTo(markersLayer.value)
+      .bindPopup(
+        `<b>${bulb.name || "Bulb"}</b><br>Status: ${bulb.status || "N/A"}`
+      );
+  }
+});
+
+};
+
 onMounted(() => {
+  initializeMap();
+
   onValue(bulbsRef, (snapshot) => {
     bulbs.value = [];
     const bulbsData = snapshot.val();
     for (let id in bulbsData) {
       bulbs.value.push({ id, ...bulbsData[id] });
     }
+    updateMapMarkers(bulbs.value); // Update markers on data change
   });
 
   onValue(logsRef, (snapshot) => {
@@ -504,61 +534,22 @@ onMounted(() => {
     for (let id in logsData) {
       logs.value.push({ id, ...logsData[id] });
     }
-    console.log(" bulbs", bulbs.value);
-
-    initializeMapMarker(bulbs.value);
   });
 });
-
-const initializeMapMarker = (data) => {
-  console.log("data11111111", data);
-  const clsuCoordinates = [15.7301769, 120.9298825]; // CLSU coordinates
-  const map = L.map("map").setView(clsuCoordinates, 17); // Initialize map
-
-  // Add OpenStreetMap tile layer
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution:
-      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }).addTo(map);
-
-  // Custom icons
-  const redIcon = L.divIcon({
-    className: "fa-2x",
-    html: '<i class="fas fa-map-marker-alt" style="color:red;"></i>',
-    iconSize: [40, 40],
-  });
-
-  // Place markers for each bulb in data
-  data.forEach((bulb) => {
-    console.log("here", bulb);
-    if (bulb.latitude && bulb.longitude) {
-      L.marker([bulb.latitude, bulb.longitude], { icon: redIcon })
-        .addTo(map)
-        .bindPopup(
-          `<b>${bulb.name || "Bulb"}</b><br>Status: ${bulb.status || "N/A"}`
-        );
-    }
-  });
-
-  map.on("click", function (e) {
-    const { lat, lng } = e.latlng;
-    L.marker([lat, lng], { icon: redIcon }).addTo(map);
-  });
-};
 
 // Computed properties for counts
 const totalDevices = computed(() => bulbs.value.length);
 const totalActive = computed(
-  () => bulbs.value.filter((device) => device.status === "Active").length
+  () => bulbs.value.filter((device) => device.active== true).length
 );
 const totalInactive = computed(
-  () => bulbs.value.filter((device) => device.status === "Inactive").length
+  () => bulbs.value.filter((device) => device.active == false).length
 );
 const totalOn = computed(
-  () => bulbs.value.filter((device) => device.status === "On").length
+  () => bulbs.value.filter((device) => device.status === "Active").length
 );
 const totalOff = computed(
-  () => bulbs.value.filter((device) => device.status === "Off").length
+  () => bulbs.value.filter((device) => device.status === "Inactive").length
 );
 
 const toggleStatus = (device) => {
