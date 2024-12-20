@@ -80,7 +80,7 @@
                           class="fas fa-lightbulb"
                           :style="{
                             color:
-                              device.status === 'Active' ? 'yellow' : 'gray',
+                              device.ac_voltage >190 ? 'yellow' : 'gray',
                             fontSize: '60px',
                           }"
                         ></i>
@@ -89,7 +89,7 @@
                         <h5 class="card-title">{{ device.name }}</h5>
                         <p class="card-text">Location: {{ device.location }}</p>
                         <p class="card-text">
-                          Status:
+                          Is Active?:
                           <span
                             :class="
                               device.active === true
@@ -100,18 +100,32 @@
                             {{ device.active }}
                           </span>
                         </p>
+                        <p class="card-text">
+                          Status:
+                          <span
+                            :class="
+                              device.ac_voltage > 190
+                                ? 'text-success'
+                                : 'text-danger'
+                            "
+                          >
+                            {{ device.ac_voltage > 190? device.relay_status=="ON"? "ON":"ON (Manual)" :"OFF" }}
+                          </span>
+                        </p>
+                        
                         <div class="form-check form-switch">
                           <input
                             type="checkbox"
                             class="form-check-input"
-                            :checked="device.status === 'Active'"
+                            :disabled="device.active"
+                            :checked="device.ac_voltage > 190"
                             @change="toggleStatus(device)"
                           />
                           <label class="form-check-label">
                             {{
-                              device.status === "Active"
-                                ? "Turn Off"
-                                : "Turn On"
+                              device?.ac_voltage < 190 
+                                ? "Turn Off" 
+                                : "Turn On" 
                             }}
                           </label>
                         </div>
@@ -246,8 +260,8 @@
                     v-model="newDevice.status"
                     required
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                  <option value=true>Active</option>
+                  <option value=false>Inactive</option>
                   </select>
                 </div>
                 <div class="mb-3">
@@ -260,8 +274,8 @@
                     v-model="newDevice.relay_status"
                     required
                   >
-                    <option value="On">On</option>
-                    <option value="Off">Off</option>
+                    <option value="ON">ON</option>
+                    <option value="OFF">OFF</option>
                   </select>
                 </div>
                 <div class="mb-3">
@@ -400,7 +414,7 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 const bulbs = ref([]);
 const logs = ref([]);
 const bulbsRef = dbRef(db, "bulbs");
-const logsRef = dbRef(db, "deviceLogs");
+const logsRef = dbRef(db, "logs");
 
 // Selected device for update
 const selectedDevice = ref({});
@@ -446,7 +460,7 @@ const newDevice = ref({
   name: "",
   location: "",
   status: "Active",
-  relay_status: "Off",
+  relay_status: "OFF",
   active: true,
   latitude: "",
   longitude: "",
@@ -461,7 +475,7 @@ const addDevice = async () => {
       name: "",
       location: "",
       status: "Active",
-      relay_status: "Off",
+      relay_status: "OFF",
       active: true,
       latitude: "",
       longitude: "",
@@ -546,21 +560,22 @@ const totalInactive = computed(
   () => bulbs.value.filter((device) => device.active == false).length
 );
 const totalOn = computed(
-  () => bulbs.value.filter((device) => device.status === "Active").length
+  () => bulbs.value.filter((device) => device.status === "ON").length
 );
 const totalOff = computed(
-  () => bulbs.value.filter((device) => device.status === "Inactive").length
+  () => bulbs.value.filter((device) => device.status === "OFF").length
 );
 
 const toggleStatus = (device) => {
-  const updatedStatus = device.status === "Active" ? "Inactive" : "Active";
-  update(dbRef(db, `bulbs/${device.id}`), { status: updatedStatus });
+  const updatedStatus = device.relay_status === "ON" ? "OFF" : "ON";
+
+  update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
 
   const logEntry = {
     deviceName: device.name,
     deviceId: device.id,
     dateTime: new Date().toLocaleString(),
-    status: updatedStatus,
+    relay_status: device.ac_voltage > 190 ? "OFF" :"ON" ,
   };
   push(logsRef, logEntry);
 };
