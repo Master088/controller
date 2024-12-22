@@ -25,7 +25,7 @@
               </div>
             </div>
           </div>
-          <div class="col">
+          <!-- <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
                 <h5 class="fw-normal">Total Active</h5>
@@ -40,7 +40,7 @@
                 <p class="card-text">{{ totalInactive }}</p>
               </div>
             </div>
-          </div>
+          </div> -->
           <div class="col">
             <div class="card shadow-sm border-start border-5 border-0">
               <div class="card-body">
@@ -88,7 +88,7 @@
                       <div class="text-center">
                         <h5 class="card-title">{{ device.name }}</h5>
                         <p class="card-text">Location: {{ device.location }}</p>
-                        <p class="card-text">
+                        <!-- <p class="card-text">
                           Is Active?:
                           <span
                             :class="
@@ -99,7 +99,7 @@
                           >
                             {{ device.active }}
                           </span>
-                        </p>
+                        </p> -->
                         <p class="card-text">
                           Status:
                           <span
@@ -109,7 +109,7 @@
                                 : 'text-danger'
                             "
                           >
-                            {{ device.ac_voltage > 190? device.relay_status=="ON"? "ON":"ON (Manual)" :"OFF" }}
+                            {{ device.ac_voltage > 190? "ON":"OFF" }}
                           </span>
                         </p>
                         
@@ -185,10 +185,10 @@
                 <h5 class="card-title">Device Log</h5>
                 <ul class="list-group list-group-flush">
                   <li class="list-group-item" v-for="log in logs" :key="log.id">
-                    <strong>{{ log.deviceName }}</strong> - {{ log.dateTime }} -
+                    <strong>{{ log.device_name }}</strong> - {{ log.time }} -
                     <span
                       :class="
-                        log.status === 'Active' ? 'text-success' : 'text-danger'
+                        log.status === 'ON' ? 'text-success' : 'text-danger'
                       "
                     >
                       {{ log.status }}
@@ -252,7 +252,7 @@
                     required
                   />
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="deviceStatus" class="form-label">Status</label>
                   <select
                     id="deviceStatus"
@@ -263,7 +263,7 @@
                   <option value=true>Active</option>
                   <option value=false>Inactive</option>
                   </select>
-                </div>
+                </div> -->
                 <div class="mb-3">
                   <label for="deviceRelay" class="form-label"
                     >Relay Status</label
@@ -355,7 +355,7 @@
                     required
                   />
                 </div>
-                <div class="mb-3">
+                <!-- <div class="mb-3">
                   <label for="updateDeviceStatus" class="form-label"
                     >Active?</label
                   >
@@ -368,7 +368,7 @@
                     <option value=true>Active</option>
                     <option value=false>Inactive</option>
                   </select>
-                </div>
+                </div> -->
                 <div class="mb-3">
                   <label for="latitude" class="form-label">Latitude</label>
                   <input
@@ -543,12 +543,22 @@ onMounted(() => {
   });
 
   onValue(logsRef, (snapshot) => {
-    logs.value = [];
-    const logsData = snapshot.val();
-    for (let id in logsData) {
-      logs.value.push({ id, ...logsData[id] });
+  logs.value = [];
+  const logsData = snapshot.val();
+
+  for (let id in logsData) {
+    try {
+      // Replace single quotes with double quotes in the JSON string
+      const correctedData = logsData[id].replace(/'/g, '"');
+      const parsedLog = JSON.parse(correctedData);
+      logs.value.push({ id, ...parsedLog });
+    } catch (error) {
+      console.error("Failed to parse log data:", logsData[id], error);
     }
-  });
+  }
+  console.log(" logs.value", logs.value)
+});
+
 });
 
 // Computed properties for counts
@@ -571,13 +581,26 @@ const toggleStatus = (device) => {
 
   update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
 
-  const logEntry = {
-    deviceName: device.name,
-    deviceId: device.id,
-    dateTime: new Date().toLocaleString(),
-    relay_status: device.ac_voltage > 190 ? "OFF" :"ON" ,
-  };
-  push(logsRef, logEntry);
+  const formatDateTime = (date) => {
+  const pad = (num) => String(num).padStart(2, '0'); // Pads single digits with a leading zero
+  const month = pad(date.getMonth() + 1); // Months are zero-based
+  const day = pad(date.getDate());
+  const year = date.getFullYear();
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+  return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+};
+
+const logEntry = {
+  device_name: device.name,
+  device_id: device.id,
+  time: formatDateTime(new Date()), // Use the custom formatter
+  status: device.ac_voltage > 190 ? "OFF" : "ON",
+};
+
+push(logsRef, JSON.stringify(logEntry));
+
 };
 </script>
 
