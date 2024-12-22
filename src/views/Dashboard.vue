@@ -117,7 +117,7 @@
                           <input
                             type="checkbox"
                             class="form-check-input"
-                            :disabled="device.active"
+                           
                             :checked="device.ac_voltage > 190"
                             @change="toggleStatus(device)"
                           />
@@ -556,8 +556,13 @@ onMounted(() => {
       console.error("Failed to parse log data:", logsData[id], error);
     }
   }
-  console.log(" logs.value", logs.value)
+
+  // Sort logs by date, newer first
+  logs.value.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+  console.log("Sorted logs.value:", logs.value);
 });
+
 
 });
 
