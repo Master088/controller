@@ -15,7 +15,7 @@
             <a
               href="https://flowbite.com/"
               class="text-decoration-none text-white hover-underline"
-              >CLSU Street Light Controller™</a
+              >RNC SMART LIGHT CONTROL AND MONITORING™</a
             >. All Rights Reserved.
           </span>
         </div>
