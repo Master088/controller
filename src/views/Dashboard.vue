@@ -86,6 +86,7 @@
                         ></i>
                       </div>
                       <div class="text-center">
+                        <span class="card-title">{{ device.id}}</span>
                         <h5 class="card-title">{{ device.name }}</h5>
                         <p class="card-text">Location: {{ device.location }}</p>
                         <!-- <p class="card-text">
