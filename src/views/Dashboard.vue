@@ -511,7 +511,7 @@ const iconSize = [40, 40];
 data.forEach((bulb) => {
   if (bulb.latitude && bulb.longitude) {
     // Determine the color based on status
-    const markerColor = bulb.status === "Active" ? "green" : "red";
+    const markerColor = bulb.ac_voltage > 190 ? "green" : "red";
 
     // Create the icon with the dynamic color
     const markerIcon = L.divIcon({
@@ -576,10 +576,10 @@ const totalInactive = computed(
   () => bulbs.value.filter((device) => device.active == false).length
 );
 const totalOn = computed(
-  () => bulbs.value.filter((device) => device.status === "ON").length
+  () => bulbs.value.filter((device) => device.ac_voltage > 190 ).length
 );
 const totalOff = computed(
-  () => bulbs.value.filter((device) => device.status === "OFF").length
+  () => bulbs.value.filter((device) =>device.ac_voltage < 190).length
 );
 
 const toggleStatus = (device) => {
@@ -587,25 +587,25 @@ const toggleStatus = (device) => {
 
   update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
 
-  const formatDateTime = (date) => {
-  const pad = (num) => String(num).padStart(2, '0'); // Pads single digits with a leading zero
-  const month = pad(date.getMonth() + 1); // Months are zero-based
-  const day = pad(date.getDate());
-  const year = date.getFullYear();
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  const seconds = pad(date.getSeconds());
-  return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
-};
+  // const formatDateTime = (date) => {
+  // const pad = (num) => String(num).padStart(2, '0'); // Pads single digits with a leading zero
+  // const month = pad(date.getMonth() + 1); // Months are zero-based
+  // const day = pad(date.getDate());
+  // const year = date.getFullYear();
+  // const hours = pad(date.getHours());
+  // const minutes = pad(date.getMinutes());
+  // const seconds = pad(date.getSeconds());
+  // return `${month}/${day}/${year} ${hours}:${minutes}:${seconds}`;
+// };
 
-const logEntry = {
-  device_name: device.name,
-  device_id: device.id,
-  time: formatDateTime(new Date()), // Use the custom formatter
-  status: device.ac_voltage > 190 ? "OFF" : "ON",
-};
+// const logEntry = {
+//   device_name: device.name,
+//   device_id: device.id,
+//   time: formatDateTime(new Date()), // Use the custom formatter
+//   status: device.ac_voltage > 190 ? "OFF" : "ON",
+// };
 
-push(logsRef, JSON.stringify(logEntry));
+// push(logsRef, JSON.stringify(logEntry));
 
 };
 </script>
