@@ -1,6 +1,6 @@
 <!-- src/layouts/AuthLayout.vue -->
 <template>
-  <div style="background-color: #f5f5f5">
+  <div style="background-color: #1a2d4a">
     <main>
       <router-view />
     </main>

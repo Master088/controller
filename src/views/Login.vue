@@ -18,7 +18,7 @@
                     src="../assets/undraw_date_night_bda8.svg"
                   />
                   <hr class="border-primary-subtle mb-4" />
-                  <h2 class="h1 mb-2">RNC SMART LIGHT CONTROL AND MONITORING</h2>
+                  <h2 class="h1 mb-2">SMART LIGHT CONTROL AND MONITORING</h2>
                   <p class="mb-5" style="color: #d9d9d9">
                     Efficient Lighting Management for Smarter Streets
                   </p>
