@@ -34,7 +34,7 @@
                   <div class="row">
                     <div class="col-12">
                       <div class="mb-4">
-                        <h3>Log in TEST</h3>
+                        <h3>Log in</h3>
                       </div>
                     </div>
                   </div>
