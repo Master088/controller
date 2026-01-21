@@ -5,7 +5,7 @@
       <!-- Top Header -->
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div class="header-block">
-          <h3 class="mb-1 fw-bold text-white">Dashboard</h3>
+          <h3 class="mb-1 fw-bold text-white">Dashboard UPDATED</h3>
           <p class="mb-0 text-white-50 small">
             Monitor devices, toggle power, and track real-time activity.
           </p>
