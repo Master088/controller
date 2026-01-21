@@ -1,11 +1,10 @@
 <template>
-  <div class="dashboard-wrap">
-    <!-- Centered container for perfect alignment -->
-    <div class="page-container">
-      <!-- Top Header -->
+  <div class="mt-4 dashboard-wrap">
+    <!-- Top Header -->
+    <div class="container-fluid px-3 px-md-4">
       <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
         <div class="header-block">
-          <h3 class="mb-1 fw-bold text-white">Dashboard UPDATED</h3>
+          <h3 class="mb-1 fw-bold text-white">Dashboard</h3>
           <p class="mb-0 text-white-50 small">
             Monitor devices, toggle power, and track real-time activity.
           </p>
@@ -21,11 +20,13 @@
           <i class="fas fa-plus me-2"></i> Add Device
         </button>
       </div>
+    </div>
 
-      <!-- Stats Row -->
-      <div class="row g-3 mb-4 align-items-stretch">
+    <!-- Stats Row -->
+    <div class="container-fluid px-3 px-md-4">
+      <div class="row g-3 mb-4">
         <div class="col-12 col-md-4">
-          <div class="stat-card h-100">
+          <div class="stat-card reveal-in">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <div class="stat-label">Total Devices</div>
@@ -39,10 +40,10 @@
         </div>
 
         <div class="col-12 col-md-4">
-          <div class="stat-card h-100">
+          <div class="stat-card reveal-in">
             <div class="d-flex align-items-center justify-content-between">
               <div>
-                <div class="stat-label">Total On TEST</div>
+                <div class="stat-label">Total On</div>
                 <div class="stat-value text-success">{{ totalOn }}</div>
               </div>
               <div class="stat-icon on">
@@ -53,7 +54,7 @@
         </div>
 
         <div class="col-12 col-md-4">
-          <div class="stat-card h-100">
+          <div class="stat-card reveal-in">
             <div class="d-flex align-items-center justify-content-between">
               <div>
                 <div class="stat-label">Total Off</div>
@@ -66,9 +67,11 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Main Content -->
-      <div class="row g-4 align-items-start">
+    <!-- Main Content -->
+    <div class="container-fluid px-3 px-md-4">
+      <div class="row g-4">
         <!-- Devices -->
         <div class="col-12 col-lg-9">
           <div class="panel-card">
@@ -84,96 +87,96 @@
               </div>
             </div>
 
-            <div class="p-3 pt-2">
-              <div class="row g-3">
-                <div class="col-12 col-sm-6 col-md-4 col-xl-3" v-for="device in bulbs" :key="device.id">
-                  <div
-                    class="device-card spotlight tilt h-100"
-                    @mousemove="tiltMove"
-                    @mouseleave="tiltLeave"
-                    @mouseenter="tiltEnter"
-                    @mousemove.capture="spotlightMove"
-                    @mouseleave.capture="spotlightLeave"
-                  >
-                    <!-- Kebab -->
-                    <div class="position-absolute top-0 end-0 p-2">
-                      <div class="dropdown">
-                        <button class="btn btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                          <i class="fas fa-ellipsis-v"></i>
-                        </button>
+            <!-- Device Cards -->
+            <div class="row g-3 mt-1">
+              <div class="col-12 col-sm-6 col-md-4 col-xl-3" v-for="device in bulbs" :key="device.id">
+                <div
+                  class="device-card spotlight tilt"
+                  @mousemove="tiltMove"
+                  @mouseleave="tiltLeave"
+                  @mouseenter="tiltEnter"
+                  @mousemove.capture="spotlightMove"
+                  @mouseleave.capture="spotlightLeave"
+                >
+                  <!-- Kebab Menu -->
+                  <div class="position-absolute top-0 end-0 p-2">
+                    <div class="dropdown">
+                      <button class="btn btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                      </button>
 
-                        <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
-                          <li>
-                            <!-- IMPORTANT: programmatic modal open -->
-                            <button type="button" class="dropdown-item" @click="openUpdateModal(device)">
-                              <i class="fas fa-pen me-2"></i> Update
-                            </button>
-                          </li>
-                          <li>
-                            <button class="dropdown-item text-danger" type="button" @click="deleteDevice(device.id)">
-                              <i class="fas fa-trash me-2"></i> Delete
-                            </button>
-                          </li>
-                        </ul>
+                      <!-- IMPORTANT: Update opens modal programmatically (works inside dropdown) -->
+                      <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                        <li>
+                          <button type="button" class="dropdown-item" @click="openUpdateModal(device)">
+                            <i class="fas fa-pen me-2"></i> Update
+                          </button>
+                        </li>
+                        <li>
+                          <button class="dropdown-item text-danger" type="button" @click="deleteDevice(device.id)">
+                            <i class="fas fa-trash me-2"></i> Delete
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div class="card-body text-center">
+                    <!-- Bulb Icon -->
+                    <div class="bulb-wrap mb-3">
+                      <i class="fas fa-lightbulb bulb" :class="device.ac_voltage > 190 ? 'is-on' : 'is-off'"></i>
+                      <div class="bulb-glow" :class="device.ac_voltage > 190 ? 'glow-on' : 'glow-off'"></div>
+                    </div>
+
+                    <div class="small text-white-50">ID: {{ device.id }}</div>
+                    <div class="h5 mb-1 fw-bold text-white">{{ device.name }}</div>
+                    <div class="text-white-50 small mb-2">📍 {{ device.location }}</div>
+
+                    <div class="status-line mb-2">
+                      <span class="text-white-50">Status:</span>
+                      <span class="ms-2 fw-bold" :class="device.ac_voltage > 190 ? 'text-success' : 'text-danger'">
+                        {{ device.ac_voltage > 190 ? "ON" : "OFF" }}
+                      </span>
+                    </div>
+
+                    <div class="d-flex justify-content-center">
+                      <div class="form-check form-switch text-start">
+                        <input
+                          type="checkbox"
+                          class="form-check-input"
+                          :checked="device.ac_voltage > 190"
+                          @change="toggleStatus(device)"
+                        />
+                        <label class="form-check-label text-white-50 small">
+                          {{ device?.ac_voltage < 190 ? "Turn On" : "Turn Off" }}
+                        </label>
                       </div>
                     </div>
 
-                    <div class="card-body text-center d-flex flex-column">
-                      <div class="bulb-wrap mb-3">
-                        <i class="fas fa-lightbulb bulb" :class="device.ac_voltage > 190 ? 'is-on' : 'is-off'"></i>
-                        <div class="bulb-glow" :class="device.ac_voltage > 190 ? 'glow-on' : 'glow-off'"></div>
-                      </div>
-
-                      <div class="small text-white-50">ID: {{ device.id }}</div>
-                      <div class="h5 mb-1 fw-bold text-white">{{ device.name }}</div>
-                      <div class="text-white-50 small mb-2">📍 {{ device.location }}</div>
-
-                      <div class="status-line mb-2">
-                        <span class="text-white-50">Status:</span>
-                        <span class="ms-2 fw-bold" :class="device.ac_voltage > 190 ? 'text-success' : 'text-danger'">
-                          {{ device.ac_voltage > 190 ? "ON" : "OFF" }}
-                        </span>
-                      </div>
-
-                      <div class="d-flex justify-content-center mt-1">
-                        <div class="form-check form-switch text-start">
-                          <input
-                            type="checkbox"
-                            class="form-check-input"
-                            :checked="device.ac_voltage > 190"
-                            @change="toggleStatus(device)"
-                          />
-                          <label class="form-check-label text-white-50 small">
-                            {{ device?.ac_voltage < 190 ? "Turn On" : "Turn Off" }}
-                          </label>
-                        </div>
-                      </div>
-
-                      <div class="mt-auto device-foot pt-3">
-                        <span class="pill" :class="device.ac_voltage > 190 ? 'pill-on' : 'pill-off'">
-                          {{ device.ac_voltage > 190 ? "Powered" : "Standby" }}
-                        </span>
-                      </div>
+                    <!-- Subtle footer -->
+                    <div class="device-foot mt-3">
+                      <span class="pill" :class="device.ac_voltage > 190 ? 'pill-on' : 'pill-off'">
+                        {{ device.ac_voltage > 190 ? "Powered" : "Standby" }}
+                      </span>
                     </div>
                   </div>
                 </div>
-              </div><!-- row -->
-            </div><!-- pad -->
+              </div>
+            </div>
+            <!-- /Device Cards -->
           </div>
         </div>
 
         <!-- Log -->
         <div class="col-12 col-lg-3">
-          <div class="panel-card log-panel sticky-log">
+          <div class="panel-card log-panel">
             <div class="panel-head">
               <h5 class="mb-0 text-white fw-bold">Device Log</h5>
               <p class="mb-0 text-white-50 small">Latest activity (newest first)</p>
             </div>
 
             <div class="log-list">
-              <div v-if="!logs.length" class="text-white-50 small p-3">
-                No logs yet.
-              </div>
+              <div v-if="!logs.length" class="text-white-50 small p-3">No logs yet.</div>
 
               <div v-for="log in logs" :key="log.id" class="log-item">
                 <div class="d-flex justify-content-between align-items-start gap-2">
@@ -191,49 +194,62 @@
         </div>
         <!-- /Log -->
       </div>
+    </div>
 
-      <!-- Map -->
-      <div class="mt-4">
-        <div class="panel-card map-shell">
-          <div class="panel-head d-flex justify-content-between align-items-center">
-            <div>
-              <h5 class="mb-0 text-white fw-bold">Map</h5>
-              <p class="mb-0 text-white-50 small">Device locations + status markers</p>
-            </div>
-            <span class="badge badge-soft">OpenStreetMap</span>
+    <!-- Map -->
+    <div class="container-fluid px-3 px-md-4 mt-4">
+      <div class="panel-card map-shell">
+        <div class="panel-head d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0 text-white fw-bold">Map</h5>
+            <p class="mb-0 text-white-50 small">Device locations + status markers</p>
           </div>
-          <div id="map" class="map"></div>
+          <span class="badge badge-soft">OpenStreetMap</span>
         </div>
+        <div id="map" class="map"></div>
       </div>
     </div>
 
-    <!-- Add Modal -->
-    <div class="modal fade" id="addDeviceModal" ref="addModalEl" tabindex="-1" aria-hidden="true">
+    <!-- Add Device Modal -->
+    <div
+      class="modal fade"
+      id="addDeviceModal"
+      ref="addModalEl"
+      tabindex="-1"
+      aria-labelledby="addDeviceModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-glass">
           <div class="modal-header border-0">
             <div>
-              <h5 class="modal-title text-white fw-bold">Add New Device</h5>
+              <h5 class="modal-title text-white fw-bold" id="addDeviceModalLabel">Add New Device</h5>
               <p class="mb-0 text-white-50 small">Fill in the device info</p>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
           <div class="modal-body pt-0">
             <form @submit.prevent="addDevice">
               <div class="mb-3">
-                <label class="form-label text-white-50 small">Device Name</label>
-                <input class="form-control form-dark" v-model="newDevice.name" required />
+                <label for="deviceName" class="form-label text-white-50 small">Device Name</label>
+                <input type="text" id="deviceName" class="form-control form-dark" v-model="newDevice.name" required />
               </div>
 
               <div class="mb-3">
-                <label class="form-label text-white-50 small">Location</label>
-                <input class="form-control form-dark" v-model="newDevice.location" required />
+                <label for="deviceLocation" class="form-label text-white-50 small">Location</label>
+                <input
+                  type="text"
+                  id="deviceLocation"
+                  class="form-control form-dark"
+                  v-model="newDevice.location"
+                  required
+                />
               </div>
 
               <div class="mb-3">
-                <label class="form-label text-white-50 small">Relay Status</label>
-                <select class="form-select form-dark" v-model="newDevice.relay_status" required>
+                <label for="deviceRelay" class="form-label text-white-50 small">Relay Status</label>
+                <select id="deviceRelay" class="form-select form-dark" v-model="newDevice.relay_status" required>
                   <option value="ON">ON</option>
                   <option value="OFF">OFF</option>
                 </select>
@@ -241,12 +257,12 @@
 
               <div class="row g-3">
                 <div class="col-6">
-                  <label class="form-label text-white-50 small">Latitude</label>
-                  <input class="form-control form-dark" v-model="newDevice.latitude" />
+                  <label for="latitude" class="form-label text-white-50 small">Latitude</label>
+                  <input type="text" id="latitude" class="form-control form-dark" v-model="newDevice.latitude" />
                 </div>
                 <div class="col-6">
-                  <label class="form-label text-white-50 small">Longitude</label>
-                  <input class="form-control form-dark" v-model="newDevice.longitude" />
+                  <label for="longitude" class="form-label text-white-50 small">Longitude</label>
+                  <input type="text" id="longitude" class="form-control form-dark" v-model="newDevice.longitude" />
                 </div>
               </div>
 
@@ -259,38 +275,56 @@
       </div>
     </div>
 
-    <!-- Update Modal -->
-    <div class="modal fade" id="update_device" ref="updateModalEl" tabindex="-1" aria-hidden="true">
+    <!-- Update Device Modal -->
+    <div
+      class="modal fade"
+      id="update_device"
+      ref="updateModalEl"
+      tabindex="-1"
+      aria-labelledby="updateDeviceModalLabel"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-glass">
           <div class="modal-header border-0">
             <div>
-              <h5 class="modal-title text-white fw-bold">Update Device</h5>
+              <h5 class="modal-title text-white fw-bold" id="updateDeviceModalLabel">Update Device</h5>
               <p class="mb-0 text-white-50 small">Edit device details</p>
             </div>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
 
           <div class="modal-body pt-0">
             <form @submit.prevent="updateDevice">
               <div class="mb-3">
-                <label class="form-label text-white-50 small">Device Name</label>
-                <input class="form-control form-dark" v-model="selectedDevice.name" required />
+                <label for="updateDeviceName" class="form-label text-white-50 small">Device Name</label>
+                <input
+                  type="text"
+                  id="updateDeviceName"
+                  class="form-control form-dark"
+                  v-model="selectedDevice.name"
+                  required
+                />
               </div>
 
               <div class="mb-3">
-                <label class="form-label text-white-50 small">Location</label>
-                <input class="form-control form-dark" v-model="selectedDevice.location" required />
+                <label for="updateDeviceLocation" class="form-label text-white-50 small">Location</label>
+                <input
+                  type="text"
+                  id="updateDeviceLocation"
+                  class="form-control form-dark"
+                  v-model="selectedDevice.location"
+                  required
+                />
               </div>
 
               <div class="row g-3">
                 <div class="col-6">
-                  <label class="form-label text-white-50 small">Latitude</label>
-                  <input class="form-control form-dark" v-model="selectedDevice.latitude" />
+                  <label for="latitude2" class="form-label text-white-50 small">Latitude</label>
+                  <input type="text" id="latitude2" class="form-control form-dark" v-model="selectedDevice.latitude" />
                 </div>
                 <div class="col-6">
-                  <label class="form-label text-white-50 small">Longitude</label>
-                  <input class="form-control form-dark" v-model="selectedDevice.longitude" />
+                  <label for="longitude2" class="form-label text-white-50 small">Longitude</label>
+                  <input type="text" id="longitude2" class="form-control form-dark" v-model="selectedDevice.longitude" />
                 </div>
               </div>
 
@@ -302,12 +336,12 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
 import { onMounted, onUnmounted, ref, computed, nextTick } from "vue";
+import { Modal } from "bootstrap";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
 import L from "leaflet";
@@ -320,16 +354,6 @@ const bulbsRef = dbRef(db, "bulbs");
 const logsRef = dbRef(db, "logs");
 
 const selectedDevice = ref({});
-const newDevice = ref({
-  name: "",
-  location: "",
-  status: "Active",
-  relay_status: "OFF",
-  active: true,
-  latitude: "",
-  longitude: "",
-});
-
 const map = ref(null);
 const markersLayer = ref(null);
 
@@ -337,167 +361,9 @@ const markersLayer = ref(null);
 const addModalEl = ref(null);
 const updateModalEl = ref(null);
 
-/** ✅ Bootstrap Modal getter (works for CDN or bundle) */
-const getBsModal = () => {
-  // If you are using bootstrap bundle globally (CDN/bundle)
-  if (window?.bootstrap?.Modal) return window.bootstrap.Modal;
-
-  // If not global, try dynamic import fallback (won’t crash app if missing)
-  return null;
-};
-
-const hideOpenDropdowns = () => {
-  // close any open dropdown menus to avoid focus conflicts
-  document.querySelectorAll(".dropdown-menu.show").forEach((menu) => {
-    menu.classList.remove("show");
-  });
-};
-
-const showModal = async (el) => {
-  await nextTick();
-
-  const ModalCtor = getBsModal();
-  if (!ModalCtor) {
-    console.error("Bootstrap Modal not found. Make sure bootstrap.bundle.min.js is loaded.");
-    return;
-  }
-
-  if (!el) return;
-  const modal = ModalCtor.getOrCreateInstance(el, { backdrop: "static", keyboard: true });
-  modal.show();
-};
-
-const hideModal = (el) => {
-  const ModalCtor = getBsModal();
-  if (!ModalCtor || !el) return;
-  ModalCtor.getInstance(el)?.hide();
-};
-
-const openAddModal = async () => {
-  hideOpenDropdowns();
-  await showModal(addModalEl.value || document.getElementById("addDeviceModal"));
-};
-
-const openUpdateModal = async (device) => {
-  hideOpenDropdowns();
-  selectedDevice.value = { ...device }; // ✅ includes id
-  await showModal(updateModalEl.value || document.getElementById("update_device"));
-};
-
-// CRUD
-const addDevice = async () => {
-  try {
-    await push(bulbsRef, { ...newDevice.value });
-
-    Object.assign(newDevice.value, {
-      name: "",
-      location: "",
-      status: "Active",
-      relay_status: "OFF",
-      active: true,
-      latitude: "",
-      longitude: "",
-    });
-
-    hideModal(addModalEl.value || document.getElementById("addDeviceModal"));
-  } catch (e) {
-    console.error("Error adding device:", e);
-  }
-};
-
-const updateDevice = async () => {
-  try {
-    if (!selectedDevice.value?.id) {
-      console.error("Missing device id. selectedDevice:", selectedDevice.value);
-      return;
-    }
-
-    await update(dbRef(db, `bulbs/${selectedDevice.value.id}`), {
-      name: selectedDevice.value.name,
-      location: selectedDevice.value.location,
-      latitude: selectedDevice.value.latitude || "",
-      longitude: selectedDevice.value.longitude || "",
-    });
-
-    hideModal(updateModalEl.value || document.getElementById("update_device"));
-  } catch (e) {
-    console.error("Error updating device:", e);
-  }
-};
-
-const deleteDevice = async (deviceId) => {
-  if (!confirm("Are you sure you want to delete this device?")) return;
-  try {
-    await remove(dbRef(db, `bulbs/${deviceId}`));
-  } catch (e) {
-    console.error("Error deleting device:", e);
-  }
-};
-
-const toggleStatus = (device) => {
-  const updatedStatus = device.relay_status === "ON" ? "OFF" : "ON";
-  update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
-};
-
-// Computed
-const totalDevices = computed(() => bulbs.value.length);
-const totalOn = computed(() => bulbs.value.filter((d) => d.ac_voltage > 190).length);
-const totalOff = computed(() => bulbs.value.filter((d) => d.ac_voltage < 190).length);
-
-// Map
-const initializeMap = () => {
-  const muñozCoordinates = [15.7301769, 120.9298825];
-  map.value = L.map("map").setView(muñozCoordinates, 14);
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors",
-  }).addTo(map.value);
-
-  markersLayer.value = L.layerGroup().addTo(map.value);
-};
-
-const updateMapMarkers = (data) => {
-  if (!markersLayer.value) return;
-  markersLayer.value.clearLayers();
-
-  data.forEach((bulb) => {
-    if (bulb.latitude && bulb.longitude) {
-      const isOn = bulb.ac_voltage > 190;
-      const markerColor = isOn ? "green" : "red";
-
-      const pinIcon = L.divIcon({
-        className: "fa-2x",
-        html: `<i class="fas fa-map-marker-alt" style="color:${markerColor};"></i>`,
-        iconSize: [50, 50],
-        iconAnchor: [15, 30],
-      });
-
-      L.marker([bulb.latitude, bulb.longitude], { icon: pinIcon }).addTo(markersLayer.value);
-
-      const labelIcon = L.divIcon({
-        className: "text-label",
-        html: `<div style="
-          display:inline-block;
-          background: rgba(0,123,255,0.8);
-          color:white;
-          padding: 4px 12px;
-          border-radius: 6px;
-          font-size: 10px;
-          white-space: nowrap;
-          border: 1px solid rgba(255,255,255,0.25);
-        ">
-          ${bulb.name || "Bulb"} (${isOn ? "ON" : "OFF"})
-        </div>`,
-        iconAnchor: [-1, -3],
-        interactive: false,
-      });
-
-      L.marker([bulb.latitude, bulb.longitude], { icon: labelIcon }).addTo(markersLayer.value);
-    }
-  });
-};
-
-// Motion micro interactions (kept)
+/**
+ * Premium interactions
+ */
 const prefersReducedMotion = ref(false);
 
 const tiltEnter = (e) => {
@@ -516,6 +382,8 @@ const tiltMove = (e) => {
 
   el.style.transition = "transform 0ms";
   el.style.transform = `translateY(-6px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+  el.style.setProperty("--px", `${px}`);
+  el.style.setProperty("--py", `${py}`);
 };
 const tiltLeave = (e) => {
   const el = e.currentTarget;
@@ -547,6 +415,146 @@ const magnetLeave = (e) => {
   e.currentTarget.style.transform = "translate(0px, 0px)";
 };
 
+// Helpers: show/hide modals safely
+const showModal = (el) => {
+  if (!el) return null;
+  const modal = Modal.getOrCreateInstance(el, { backdrop: "static", keyboard: true });
+  modal.show();
+  return modal;
+};
+const hideModal = (el) => {
+  if (!el) return;
+  Modal.getInstance(el)?.hide();
+};
+
+// Open add modal
+const openAddModal = async () => {
+  await nextTick();
+  showModal(addModalEl.value || document.getElementById("addDeviceModal"));
+};
+
+// Open update modal (works inside dropdown)
+const openUpdateModal = async (device) => {
+  selectedDevice.value = { ...device };
+  await nextTick();
+  showModal(updateModalEl.value || document.getElementById("update_device"));
+};
+
+// Update device
+const updateDevice = async () => {
+  try {
+    await update(dbRef(db, `bulbs/${selectedDevice.value.id}`), {
+      name: selectedDevice.value.name,
+      location: selectedDevice.value.location,
+      active: selectedDevice.value.active == "true" ? true : false,
+      latitude: selectedDevice.value.latitude,
+      longitude: selectedDevice.value.longitude,
+    });
+
+    // close modal after update
+    hideModal(updateModalEl.value || document.getElementById("update_device"));
+  } catch (error) {
+    console.error("Error updating device:", error);
+  }
+};
+
+// Delete device
+const deleteDevice = async (deviceId) => {
+  if (confirm("Are you sure you want to delete this device?")) {
+    try {
+      await remove(dbRef(db, `bulbs/${deviceId}`));
+    } catch (error) {
+      console.error("Error deleting device:", error);
+    }
+  }
+};
+
+// New device form
+const newDevice = ref({
+  name: "",
+  location: "",
+  status: "Active",
+  relay_status: "OFF",
+  active: true,
+  latitude: "",
+  longitude: "",
+});
+
+// Add device
+const addDevice = async () => {
+  try {
+    await push(bulbsRef, { ...newDevice.value });
+    Object.assign(newDevice.value, {
+      name: "",
+      location: "",
+      status: "Active",
+      relay_status: "OFF",
+      active: true,
+      latitude: "",
+      longitude: "",
+    });
+
+    // close modal after add
+    hideModal(addModalEl.value || document.getElementById("addDeviceModal"));
+  } catch (error) {
+    console.error("Error adding new device:", error);
+  }
+};
+
+// Map init
+const initializeMap = () => {
+  const muñozCoordinates = [15.7301769, 120.9298825];
+  map.value = L.map("map").setView(muñozCoordinates, 14);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map.value);
+
+  markersLayer.value = L.layerGroup().addTo(map.value);
+};
+
+// Add bulb markers with visible labels
+const updateMapMarkers = (data) => {
+  if (!markersLayer.value) return;
+  markersLayer.value.clearLayers();
+
+  data.forEach((bulb) => {
+    if (bulb.latitude && bulb.longitude) {
+      const isOn = bulb.ac_voltage > 190;
+      const markerColor = isOn ? "green" : "red";
+
+      const pinIcon = L.divIcon({
+        className: "fa-2x",
+        html: `<i class="fas fa-map-marker-alt" style="color:${markerColor};"></i>`,
+        iconSize: [50, 50],
+        iconAnchor: [15, 30],
+      });
+
+      L.marker([bulb.latitude, bulb.longitude], { icon: pinIcon }).addTo(markersLayer.value);
+
+      const labelIcon = L.divIcon({
+        className: "text-label",
+        html: `<div style="
+            display:inline-block;
+            background: rgba(0,123,255,0.8);
+            color:white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.25);
+          ">
+            ${bulb.name || "Bulb"} (${isOn ? "ON" : "OFF"})
+          </div>`,
+        iconAnchor: [-1, -3],
+        interactive: false,
+      });
+
+      L.marker([bulb.latitude, bulb.longitude], { icon: labelIcon }).addTo(markersLayer.value);
+    }
+  });
+};
+
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -554,14 +562,14 @@ onMounted(() => {
 
   onValue(bulbsRef, (snapshot) => {
     bulbs.value = [];
-    const bulbsData = snapshot.val() || {};
+    const bulbsData = snapshot.val();
     for (let id in bulbsData) bulbs.value.push({ id, ...bulbsData[id] });
     updateMapMarkers(bulbs.value);
   });
 
   onValue(logsRef, (snapshot) => {
     logs.value = [];
-    const logsData = snapshot.val() || {};
+    const logsData = snapshot.val();
 
     for (let id in logsData) {
       try {
@@ -569,7 +577,7 @@ onMounted(() => {
         const parsedLog = JSON.parse(correctedData);
         logs.value.push({ id, ...parsedLog });
       } catch (error) {
-        // ignore malformed
+        console.error("Failed to parse log data:", logsData[id], error);
       }
     }
 
@@ -580,25 +588,28 @@ onMounted(() => {
 onUnmounted(() => {
   if (map.value) map.value.remove();
 });
+
+// Computed counts
+const totalDevices = computed(() => bulbs.value.length);
+const totalOn = computed(() => bulbs.value.filter((d) => d.ac_voltage > 190).length);
+const totalOff = computed(() => bulbs.value.filter((d) => d.ac_voltage < 190).length);
+
+const toggleStatus = (device) => {
+  const updatedStatus = device.relay_status === "ON" ? "OFF" : "ON";
+  update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
+};
 </script>
 
 <style scoped>
-/* ✅ alignment container */
-.page-container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 18px 18px 28px;
-}
-
+/* Page background */
 .dashboard-wrap {
-  min-height: 100vh;
   padding-bottom: 28px;
   background: radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, 0.18), transparent 60%),
     radial-gradient(900px 500px at 80% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
     radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
 }
 
-/* Header */
+/* Header block */
 .header-block {
   padding: 10px 12px;
   border-radius: 16px;
@@ -638,7 +649,7 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-/* Stats */
+/* Stat cards */
 .stat-card {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.10);
@@ -681,7 +692,7 @@ onUnmounted(() => {
   border-color: rgba(239, 68, 68, 0.25);
 }
 
-/* Badges */
+/* Soft badges */
 .badge-soft {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -700,7 +711,6 @@ onUnmounted(() => {
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.20);
   overflow: hidden;
   transition: 260ms ease;
-  min-height: 300px; /* ✅ equal height feel */
 }
 .device-card:hover {
   border-color: rgba(168, 85, 247, 0.35);
@@ -791,12 +801,12 @@ onUnmounted(() => {
   background: rgba(239, 68, 68, 0.12);
 }
 
-/* Log */
+/* Log panel */
 .log-panel {
-  max-height: 520px;
+  max-height: 600px;
 }
 .log-list {
-  max-height: 460px;
+  max-height: 520px;
   overflow: auto;
 }
 .log-item {
@@ -831,17 +841,12 @@ onUnmounted(() => {
   color: #fca5a5;
 }
 
-/* ✅ Sticky log only on desktop for alignment */
-@media (min-width: 992px) {
-  .sticky-log {
-    position: sticky;
-    top: 86px; /* below navbar */
-  }
-}
-
 /* Map */
+.map-shell .panel-head {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
 .map {
-  height: 58vh;
+  height: 70vh;
   width: 100%;
   border-radius: 18px;
 }
@@ -882,5 +887,17 @@ onUnmounted(() => {
 .tilt {
   transform-style: preserve-3d;
   will-change: transform;
+}
+
+/* Scrollbar nicer (optional) */
+.log-list::-webkit-scrollbar {
+  width: 10px;
+}
+.log-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+.log-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
 }
 </style>
