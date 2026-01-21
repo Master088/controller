@@ -42,7 +42,7 @@
           <div class="stat-card h-100">
             <div class="d-flex align-items-center justify-content-between">
               <div>
-                <div class="stat-label">Total On</div>
+                <div class="stat-label">Total On TEST</div>
                 <div class="stat-value text-success">{{ totalOn }}</div>
               </div>
               <div class="stat-icon on">
