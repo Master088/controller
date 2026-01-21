@@ -17,7 +17,7 @@
           @mousemove="magnetMove"
           @mouseleave="magnetLeave"
         >
-          <i class="fas fa-plus me-2"></i> Add Device
+          <i class="fas fa-plus me-2"></i> Add Device TEST
         </button>
       </div>
 
@@ -90,17 +90,16 @@
                   >
                     <!-- Kebab -->
                     <div class="position-absolute top-0 end-0 p-2">
-                      <!-- custom menu instead of bootstrap dropdown (no JS dependency) -->
                       <div class="menu-wrap">
-                        <button class="btn btn-kebab" type="button" @click="toggleMenu(device.id)">
+                        <button class="btn btn-kebab" type="button" @click.stop="toggleMenu(device.id)">
                           <i class="fas fa-ellipsis-v"></i>
                         </button>
 
                         <div class="menu-panel" v-if="openMenuId === device.id" @click.stop>
-                          <button class="menu-item" @click="openUpdateModal(device)">
+                          <button class="menu-item" type="button" @click="openUpdateModal(device)">
                             <i class="fas fa-pen me-2"></i> Update
                           </button>
-                          <button class="menu-item danger" @click="deleteDevice(device.id)">
+                          <button class="menu-item danger" type="button" @click="deleteDevice(device.id)">
                             <i class="fas fa-trash me-2"></i> Delete
                           </button>
                         </div>
@@ -196,7 +195,7 @@
     <!-- ✅ Vue Modal Backdrop -->
     <div v-if="isAnyModalOpen" class="v-backdrop" @click="closeAllModals"></div>
 
-    <!-- ✅ Add Modal (Vue controlled) -->
+    <!-- ✅ Add Modal -->
     <div v-if="isAddOpen" class="v-modal" role="dialog" aria-modal="true" @click.stop>
       <div class="v-modal-dialog modal-glass" @click.stop>
         <div class="modal-header border-0">
@@ -246,7 +245,7 @@
       </div>
     </div>
 
-    <!-- ✅ Update Modal (Vue controlled) -->
+    <!-- ✅ Update Modal -->
     <div v-if="isEditOpen" class="v-modal" role="dialog" aria-modal="true" @click.stop>
       <div class="v-modal-dialog modal-glass" @click.stop>
         <div class="modal-header border-0">
@@ -307,7 +306,7 @@ const logsRef = dbRef(db, "logs");
 const selectedDevice = ref({});
 const openMenuId = ref(null);
 
-// ✅ Vue modal state (no bootstrap JS required)
+// ✅ Vue modal state
 const isAddOpen = ref(false);
 const isEditOpen = ref(false);
 
@@ -346,7 +345,7 @@ const toggleMenu = (id) => {
   openMenuId.value = openMenuId.value === id ? null : id;
 };
 
-// Close menu when clicking outside
+// ✅ Close menu when clicking outside (capture)
 const onDocClick = (e) => {
   const within = e.target.closest(".menu-wrap");
   if (!within) openMenuId.value = null;
@@ -415,8 +414,8 @@ const map = ref(null);
 const markersLayer = ref(null);
 
 const initializeMap = () => {
-  const muñozCoordinates = [15.7301769, 120.9298825];
-  map.value = L.map("map").setView(muñozCoordinates, 14);
+  const munozCoordinates = [15.7301769, 120.9298825];
+  map.value = L.map("map").setView(munozCoordinates, 14);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
@@ -446,8 +445,9 @@ const updateMapMarkers = (data) => {
   });
 };
 
-// Interactions (keep your premium effects)
+// Interactions
 const prefersReducedMotion = ref(false);
+
 const tiltEnter = (e) => {
   if (prefersReducedMotion.value) return;
   e.currentTarget.style.transition = "transform 120ms ease";
@@ -494,7 +494,8 @@ const magnetLeave = (e) => {
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  document.addEventListener("click", onDocClick);
+  // ✅ capture ensures outside click closes reliably
+  document.addEventListener("click", onDocClick, true);
 
   initializeMap();
 
@@ -519,7 +520,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener("click", onDocClick);
+  document.removeEventListener("click", onDocClick, true);
   if (map.value) map.value.remove();
 });
 </script>
@@ -531,11 +532,19 @@ onUnmounted(() => {
   padding: 18px;
 }
 
+/* Page background */
 .dashboard-wrap {
   min-height: 100vh;
+  padding-bottom: 28px;
   background: radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, 0.18), transparent 60%),
     radial-gradient(900px 500px at 80% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
     radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
+}
+
+/* Header block */
+.header-block {
+  padding: 10px 12px;
+  border-radius: 16px;
 }
 
 /* Buttons */
@@ -565,7 +574,8 @@ onUnmounted(() => {
   backdrop-filter: blur(14px);
   border-radius: 18px;
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22);
-  overflow: hidden;
+  /* IMPORTANT: allow menus to escape if needed */
+  overflow: visible;
 }
 .panel-head {
   padding: 14px 16px;
@@ -581,17 +591,56 @@ onUnmounted(() => {
   padding: 14px 16px;
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.18);
 }
+.stat-label {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+}
+.stat-value {
+  color: white;
+  font-weight: 900;
+  font-size: 28px;
+  line-height: 1.1;
+}
+.stat-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+.stat-icon.on {
+  background: rgba(34, 197, 94, 0.14);
+  border-color: rgba(34, 197, 94, 0.25);
+}
+.stat-icon.off {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: rgba(239, 68, 68, 0.25);
+}
 
-/* Device card */
+/* Soft badges */
+.badge-soft {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-weight: 700;
+}
+
+/* Device cards */
 .device-card {
   position: relative;
   border-radius: 18px;
   background: rgba(15, 23, 42, 0.25);
   border: 1px solid rgba(255, 255, 255, 0.10);
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.20);
-  overflow: hidden;
   transition: 260ms ease;
   min-height: 300px;
+  /* ✅ IMPORTANT: menu MUST not be clipped */
+  overflow: visible !important;
 }
 
 /* Kebab */
@@ -603,10 +652,14 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.10);
   color: rgba(255, 255, 255, 0.85);
 }
+.btn-kebab:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
 
-/* ✅ custom menu panel */
+/* ✅ Custom menu */
 .menu-wrap {
   position: relative;
+  z-index: 1000;
 }
 .menu-panel {
   position: absolute;
@@ -618,7 +671,7 @@ onUnmounted(() => {
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-  z-index: 50;
+  z-index: 9999 !important;
 }
 .menu-item {
   width: 100%;
@@ -719,6 +772,29 @@ onUnmounted(() => {
   padding: 12px 14px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
+.log-title {
+  font-size: 14px;
+}
+.log-sub {
+  font-size: 12px;
+}
+.log-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.badge-on {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.30);
+  color: #86efac;
+}
+.badge-off {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.30);
+  color: #fca5a5;
+}
 @media (min-width: 992px) {
   .sticky-log {
     position: sticky;
@@ -733,7 +809,7 @@ onUnmounted(() => {
   border-radius: 18px;
 }
 
-/* ✅ Vue modal styling */
+/* Vue modal */
 .v-backdrop {
   position: fixed;
   inset: 0;
@@ -741,7 +817,6 @@ onUnmounted(() => {
   backdrop-filter: blur(4px);
   z-index: 999;
 }
-
 .v-modal {
   position: fixed;
   inset: 0;
@@ -750,14 +825,12 @@ onUnmounted(() => {
   z-index: 1000;
   padding: 16px;
 }
-
 .v-modal-dialog {
   width: min(520px, 100%);
   border-radius: 18px;
   overflow: hidden;
   animation: popIn 180ms ease;
 }
-
 @keyframes popIn {
   from {
     opacity: 0;
@@ -768,8 +841,6 @@ onUnmounted(() => {
     transform: translateY(0) scale(1);
   }
 }
-
-/* Modal glass + inputs */
 .modal-glass {
   background: rgba(15, 23, 42, 0.78);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -793,6 +864,7 @@ onUnmounted(() => {
   content: "";
   position: absolute;
   inset: -1px;
+  border-radius: 18px;
   background: radial-gradient(240px circle at var(--x) var(--y), rgba(168, 85, 247, 0.18), transparent 55%);
   opacity: 0;
   transition: 240ms ease;
