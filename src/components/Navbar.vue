@@ -11,7 +11,7 @@
               <i class="fas fa-lightbulb"></i>
             </div>
             <div class="d-none d-sm-block">
-              <div class="brand-title">RNC Smart Light</div>
+              <div class="brand-title">Smart Light</div>
               <div class="brand-sub">Control & Monitoring</div>
             </div>
           </div>
