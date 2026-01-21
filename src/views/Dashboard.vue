@@ -534,7 +534,7 @@ onUnmounted(() => {
 /* Background */
 .dashboard-wrap {
   min-height: 100vh;
- 
+  padding-bottom: 28px;
   background: radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, 0.18), transparent 60%),
     radial-gradient(900px 500px at 80% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
     radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
