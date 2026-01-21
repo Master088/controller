@@ -13,8 +13,7 @@
         <button
           type="button"
           class="btn btn-add magnetic"
-          data-bs-toggle="modal"
-          data-bs-target="#addDeviceModal"
+          @click="openAddModal"
           @mousemove="magnetMove"
           @mouseleave="magnetLeave"
         >
@@ -102,32 +101,19 @@
                   <!-- Kebab Menu -->
                   <div class="position-absolute top-0 end-0 p-2">
                     <div class="dropdown">
-                      <button
-                        class="btn btn-kebab"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
+                      <button class="btn btn-kebab" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fas fa-ellipsis-v"></i>
                       </button>
+
+                      <!-- IMPORTANT: Update opens modal programmatically (works inside dropdown) -->
                       <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                         <li>
-                          <button
-                            type="button"
-                            class="dropdown-item"
-                            data-bs-toggle="modal"
-                            data-bs-target="#update_device"
-                            @click="openUpdateModal(device)"
-                          >
+                          <button type="button" class="dropdown-item" @click="openUpdateModal(device)">
                             <i class="fas fa-pen me-2"></i> Update
                           </button>
                         </li>
                         <li>
-                          <button
-                            class="dropdown-item text-danger"
-                            type="button"
-                            @click="deleteDevice(device.id)"
-                          >
+                          <button class="dropdown-item text-danger" type="button" @click="deleteDevice(device.id)">
                             <i class="fas fa-trash me-2"></i> Delete
                           </button>
                         </li>
@@ -138,10 +124,7 @@
                   <div class="card-body text-center">
                     <!-- Bulb Icon -->
                     <div class="bulb-wrap mb-3">
-                      <i
-                        class="fas fa-lightbulb bulb"
-                        :class="device.ac_voltage > 190 ? 'is-on' : 'is-off'"
-                      ></i>
+                      <i class="fas fa-lightbulb bulb" :class="device.ac_voltage > 190 ? 'is-on' : 'is-off'"></i>
                       <div class="bulb-glow" :class="device.ac_voltage > 190 ? 'glow-on' : 'glow-off'"></div>
                     </div>
 
@@ -151,10 +134,7 @@
 
                     <div class="status-line mb-2">
                       <span class="text-white-50">Status:</span>
-                      <span
-                        class="ms-2 fw-bold"
-                        :class="device.ac_voltage > 190 ? 'text-success' : 'text-danger'"
-                      >
+                      <span class="ms-2 fw-bold" :class="device.ac_voltage > 190 ? 'text-success' : 'text-danger'">
                         {{ device.ac_voltage > 190 ? "ON" : "OFF" }}
                       </span>
                     </div>
@@ -196,19 +176,13 @@
             </div>
 
             <div class="log-list">
-              <div v-if="!logs.length" class="text-white-50 small p-3">
-                No logs yet.
-              </div>
+              <div v-if="!logs.length" class="text-white-50 small p-3">No logs yet.</div>
 
               <div v-for="log in logs" :key="log.id" class="log-item">
                 <div class="d-flex justify-content-between align-items-start gap-2">
                   <div>
-                    <div class="log-title text-white fw-semibold">
-                      {{ log.device_name }}
-                    </div>
-                    <div class="log-sub text-white-50 small">
-                      {{ log.time }}
-                    </div>
+                    <div class="log-title text-white fw-semibold">{{ log.device_name }}</div>
+                    <div class="log-sub text-white-50 small">{{ log.time }}</div>
                   </div>
                   <span class="log-badge" :class="log.status === 'ON' ? 'badge-on' : 'badge-off'">
                     {{ log.status }}
@@ -237,7 +211,14 @@
     </div>
 
     <!-- Add Device Modal -->
-    <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+    <div
+      class="modal fade"
+      id="addDeviceModal"
+      ref="addModalEl"
+      tabindex="-1"
+      aria-labelledby="addDeviceModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-glass">
           <div class="modal-header border-0">
@@ -295,7 +276,13 @@
     </div>
 
     <!-- Update Device Modal -->
-    <div class="modal fade" id="update_device" tabindex="-1" aria-labelledby="updateDeviceModalLabel">
+    <div
+      class="modal fade"
+      id="update_device"
+      ref="updateModalEl"
+      tabindex="-1"
+      aria-labelledby="updateDeviceModalLabel"
+    >
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-glass">
           <div class="modal-header border-0">
@@ -349,12 +336,12 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, ref, computed } from "vue";
+import { onMounted, onUnmounted, ref, computed, nextTick } from "vue";
+import { Modal } from "bootstrap";
 import { db } from "../firebase";
 import { push, ref as dbRef, onValue, update, remove } from "firebase/database";
 import L from "leaflet";
@@ -369,6 +356,10 @@ const logsRef = dbRef(db, "logs");
 const selectedDevice = ref({});
 const map = ref(null);
 const markersLayer = ref(null);
+
+// Modal refs
+const addModalEl = ref(null);
+const updateModalEl = ref(null);
 
 /**
  * Premium interactions
@@ -424,9 +415,29 @@ const magnetLeave = (e) => {
   e.currentTarget.style.transform = "translate(0px, 0px)";
 };
 
-// Open update modal
-const openUpdateModal = (device) => {
+// Helpers: show/hide modals safely
+const showModal = (el) => {
+  if (!el) return null;
+  const modal = Modal.getOrCreateInstance(el, { backdrop: "static", keyboard: true });
+  modal.show();
+  return modal;
+};
+const hideModal = (el) => {
+  if (!el) return;
+  Modal.getInstance(el)?.hide();
+};
+
+// Open add modal
+const openAddModal = async () => {
+  await nextTick();
+  showModal(addModalEl.value || document.getElementById("addDeviceModal"));
+};
+
+// Open update modal (works inside dropdown)
+const openUpdateModal = async (device) => {
   selectedDevice.value = { ...device };
+  await nextTick();
+  showModal(updateModalEl.value || document.getElementById("update_device"));
 };
 
 // Update device
@@ -439,6 +450,9 @@ const updateDevice = async () => {
       latitude: selectedDevice.value.latitude,
       longitude: selectedDevice.value.longitude,
     });
+
+    // close modal after update
+    hideModal(updateModalEl.value || document.getElementById("update_device"));
   } catch (error) {
     console.error("Error updating device:", error);
   }
@@ -479,6 +493,9 @@ const addDevice = async () => {
       latitude: "",
       longitude: "",
     });
+
+    // close modal after add
+    hideModal(addModalEl.value || document.getElementById("addDeviceModal"));
   } catch (error) {
     console.error("Error adding new device:", error);
   }
@@ -490,7 +507,7 @@ const initializeMap = () => {
   map.value = L.map("map").setView(muñozCoordinates, 14);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; OpenStreetMap contributors',
+    attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map.value);
 
   markersLayer.value = L.layerGroup().addTo(map.value);
@@ -506,7 +523,6 @@ const updateMapMarkers = (data) => {
       const isOn = bulb.ac_voltage > 190;
       const markerColor = isOn ? "green" : "red";
 
-      // Standard pin
       const pinIcon = L.divIcon({
         className: "fa-2x",
         html: `<i class="fas fa-map-marker-alt" style="color:${markerColor};"></i>`,
@@ -516,20 +532,20 @@ const updateMapMarkers = (data) => {
 
       L.marker([bulb.latitude, bulb.longitude], { icon: pinIcon }).addTo(markersLayer.value);
 
-      // Label showing Bulb Name + Status
       const labelIcon = L.divIcon({
         className: "text-label",
         html: `<div style="
-                display: inline-block;
-                background: rgba(0,123,255,0.8);
-                color: white;
-                padding: 4px 12px;
-                border-radius: 4px;
-                font-size: 10px;
-                white-space: nowrap;
-              ">
-                ${bulb.name || "Bulb"} (${isOn ? "ON" : "OFF"})
-              </div>`,
+            display:inline-block;
+            background: rgba(0,123,255,0.8);
+            color:white;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 10px;
+            white-space: nowrap;
+            border: 1px solid rgba(255,255,255,0.25);
+          ">
+            ${bulb.name || "Bulb"} (${isOn ? "ON" : "OFF"})
+          </div>`,
         iconAnchor: [-1, -3],
         interactive: false,
       });
@@ -538,7 +554,6 @@ const updateMapMarkers = (data) => {
     }
   });
 };
-
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -571,7 +586,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  // Leaflet cleanup
   if (map.value) map.value.remove();
 });
 
