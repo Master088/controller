@@ -1,13 +1,11 @@
 <template>
   <div class="dashboard-wrap">
-    <div class="page-container">
-      <!-- Top Header -->
-      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div class="wrap">
+      <!-- Header -->
+      <div class="topbar">
         <div class="header-block">
           <h3 class="mb-1 fw-bold text-white">Dashboard</h3>
-          <p class="mb-0 text-white-50 small">
-            Monitor devices, toggle power, and track real-time activity.
-          </p>
+          <p class="mb-0 text-white-50 small">Monitor devices, toggle power, and track real-time activity.</p>
         </div>
 
         <button
@@ -17,7 +15,7 @@
           @mousemove="magnetMove"
           @mouseleave="magnetLeave"
         >
-          <i class="fas fa-plus me-2"></i> Add Device TEST
+          <i class="fas fa-plus me-2"></i> Add Device
         </button>
       </div>
 
@@ -65,7 +63,7 @@
         <!-- Devices -->
         <div class="col-12 col-lg-9">
           <div class="panel-card">
-            <div class="panel-head d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="panel-head">
               <div>
                 <h5 class="mb-0 text-white fw-bold">Devices</h5>
                 <p class="mb-0 text-white-50 small">Tap a card to interact quickly</p>
@@ -77,7 +75,7 @@
               </div>
             </div>
 
-            <div class="p-3 pt-2">
+            <div class="panel-body">
               <div class="row g-3">
                 <div class="col-12 col-sm-6 col-md-4 col-xl-3" v-for="device in bulbs" :key="device.id">
                   <div
@@ -154,8 +152,11 @@
         <div class="col-12 col-lg-3">
           <div class="panel-card log-panel sticky-log">
             <div class="panel-head">
-              <h5 class="mb-0 text-white fw-bold">Device Log</h5>
-              <p class="mb-0 text-white-50 small">Latest activity (newest first)</p>
+              <div>
+                <h5 class="mb-0 text-white fw-bold">Device Log</h5>
+                <p class="mb-0 text-white-50 small">Latest activity (newest first)</p>
+              </div>
+              <span class="badge badge-soft">Activity</span>
             </div>
 
             <div class="log-list">
@@ -180,7 +181,7 @@
       <!-- Map -->
       <div class="mt-4">
         <div class="panel-card map-shell">
-          <div class="panel-head d-flex justify-content-between align-items-center">
+          <div class="panel-head">
             <div>
               <h5 class="mb-0 text-white fw-bold">Map</h5>
               <p class="mb-0 text-white-50 small">Device locations + status markers</p>
@@ -192,101 +193,104 @@
       </div>
     </div>
 
-    <!-- ✅ Vue Modal Backdrop -->
+    <!-- Backdrop -->
     <div v-if="isAnyModalOpen" class="v-backdrop" @click="closeAllModals"></div>
 
-    <!-- ✅ Add Modal -->
+    <!-- Add Modal -->
     <div v-if="isAddOpen" class="v-modal" role="dialog" aria-modal="true" @click.stop>
       <div class="v-modal-dialog modal-glass" @click.stop>
-        <div class="modal-header border-0">
+        <div class="v-modal-head">
           <div>
-            <h5 class="modal-title text-white fw-bold">Add New Device</h5>
-            <p class="mb-0 text-white-50 small">Fill in the device info</p>
+            <div class="v-modal-title">Add Device</div>
+            <div class="v-modal-sub">Fill in the device info</div>
           </div>
-          <button type="button" class="btn-close btn-close-white" @click="closeAllModals"></button>
+          <button class="xbtn" type="button" @click="closeAllModals" aria-label="Close">✕</button>
         </div>
 
-        <div class="modal-body pt-0">
+        <div class="v-modal-body">
           <form @submit.prevent="addDevice">
-            <div class="mb-3">
-              <label class="form-label text-white-50 small">Device Name</label>
-              <input class="form-control form-dark" v-model="newDevice.name" required />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label text-white-50 small">Location</label>
-              <input class="form-control form-dark" v-model="newDevice.location" required />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label text-white-50 small">Relay Status</label>
-              <select class="form-select form-dark" v-model="newDevice.relay_status" required>
-                <option value="ON">ON</option>
-                <option value="OFF">OFF</option>
-              </select>
-            </div>
-
-            <div class="row g-3">
-              <div class="col-6">
-                <label class="form-label text-white-50 small">Latitude</label>
-                <input class="form-control form-dark" v-model="newDevice.latitude" />
+            <div class="grid-1">
+              <div class="field">
+                <label class="label">Device Name</label>
+                <input class="control" v-model="newDevice.name" required />
               </div>
-              <div class="col-6">
-                <label class="form-label text-white-50 small">Longitude</label>
-                <input class="form-control form-dark" v-model="newDevice.longitude" />
-              </div>
-            </div>
 
-            <button type="submit" class="btn btn-add w-100 mt-4">
-              <i class="fas fa-plus me-2"></i> Add Device
-            </button>
+              <div class="field">
+                <label class="label">Location</label>
+                <input class="control" v-model="newDevice.location" required />
+              </div>
+
+              <div class="field">
+                <label class="label">Relay Status</label>
+                <select class="control" v-model="newDevice.relay_status" required>
+                  <option value="ON">ON</option>
+                  <option value="OFF">OFF</option>
+                </select>
+              </div>
+
+              <div class="grid-2">
+                <div class="field">
+                  <label class="label">Latitude</label>
+                  <input class="control" v-model="newDevice.latitude" />
+                </div>
+                <div class="field">
+                  <label class="label">Longitude</label>
+                  <input class="control" v-model="newDevice.longitude" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-add w-100 mt-2">
+                <i class="fas fa-plus me-2"></i> Add Device
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </div>
 
-    <!-- ✅ Update Modal -->
+    <!-- Update Modal -->
     <div v-if="isEditOpen" class="v-modal" role="dialog" aria-modal="true" @click.stop>
       <div class="v-modal-dialog modal-glass" @click.stop>
-        <div class="modal-header border-0">
+        <div class="v-modal-head">
           <div>
-            <h5 class="modal-title text-white fw-bold">Update Device</h5>
-            <p class="mb-0 text-white-50 small">Edit device details</p>
+            <div class="v-modal-title">Update Device</div>
+            <div class="v-modal-sub">Edit device details</div>
           </div>
-          <button type="button" class="btn-close btn-close-white" @click="closeAllModals"></button>
+          <button class="xbtn" type="button" @click="closeAllModals" aria-label="Close">✕</button>
         </div>
 
-        <div class="modal-body pt-0">
+        <div class="v-modal-body">
           <form @submit.prevent="updateDevice">
-            <div class="mb-3">
-              <label class="form-label text-white-50 small">Device Name</label>
-              <input class="form-control form-dark" v-model="selectedDevice.name" required />
-            </div>
-
-            <div class="mb-3">
-              <label class="form-label text-white-50 small">Location</label>
-              <input class="form-control form-dark" v-model="selectedDevice.location" required />
-            </div>
-
-            <div class="row g-3">
-              <div class="col-6">
-                <label class="form-label text-white-50 small">Latitude</label>
-                <input class="form-control form-dark" v-model="selectedDevice.latitude" />
+            <div class="grid-1">
+              <div class="field">
+                <label class="label">Device Name</label>
+                <input class="control" v-model="selectedDevice.name" required />
               </div>
-              <div class="col-6">
-                <label class="form-label text-white-50 small">Longitude</label>
-                <input class="form-control form-dark" v-model="selectedDevice.longitude" />
-              </div>
-            </div>
 
-            <button type="submit" class="btn btn-add w-100 mt-4">
-              <i class="fas fa-save me-2"></i> Update Device
-            </button>
+              <div class="field">
+                <label class="label">Location</label>
+                <input class="control" v-model="selectedDevice.location" required />
+              </div>
+
+              <div class="grid-2">
+                <div class="field">
+                  <label class="label">Latitude</label>
+                  <input class="control" v-model="selectedDevice.latitude" />
+                </div>
+                <div class="field">
+                  <label class="label">Longitude</label>
+                  <input class="control" v-model="selectedDevice.longitude" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn btn-add w-100 mt-2">
+                <i class="fas fa-save me-2"></i> Update Device
+              </button>
+            </div>
           </form>
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -306,21 +310,10 @@ const logsRef = dbRef(db, "logs");
 const selectedDevice = ref({});
 const openMenuId = ref(null);
 
-// ✅ Vue modal state
+/* Vue modal state */
 const isAddOpen = ref(false);
 const isEditOpen = ref(false);
-
 const isAnyModalOpen = computed(() => isAddOpen.value || isEditOpen.value);
-
-const newDevice = ref({
-  name: "",
-  location: "",
-  status: "Active",
-  relay_status: "OFF",
-  active: true,
-  latitude: "",
-  longitude: "",
-});
 
 const closeAllModals = () => {
   isAddOpen.value = false;
@@ -336,7 +329,7 @@ const openAddModal = () => {
 
 const openUpdateModal = (device) => {
   openMenuId.value = null;
-  selectedDevice.value = { ...device }; // ✅ includes id
+  selectedDevice.value = { ...device }; // includes id
   isAddOpen.value = false;
   isEditOpen.value = true;
 };
@@ -345,13 +338,22 @@ const toggleMenu = (id) => {
   openMenuId.value = openMenuId.value === id ? null : id;
 };
 
-// ✅ Close menu when clicking outside (capture)
 const onDocClick = (e) => {
   const within = e.target.closest(".menu-wrap");
   if (!within) openMenuId.value = null;
 };
 
-// Firebase CRUD
+/* CRUD */
+const newDevice = ref({
+  name: "",
+  location: "",
+  status: "Active",
+  relay_status: "OFF",
+  active: true,
+  latitude: "",
+  longitude: "",
+});
+
 const addDevice = async () => {
   try {
     await push(bulbsRef, { ...newDevice.value });
@@ -372,10 +374,7 @@ const addDevice = async () => {
 
 const updateDevice = async () => {
   try {
-    if (!selectedDevice.value?.id) {
-      console.error("Missing device id:", selectedDevice.value);
-      return;
-    }
+    if (!selectedDevice.value?.id) return;
 
     await update(dbRef(db, `bulbs/${selectedDevice.value.id}`), {
       name: selectedDevice.value.name,
@@ -404,12 +403,12 @@ const toggleStatus = (device) => {
   update(dbRef(db, `bulbs/${device.id}`), { relay_status: updatedStatus });
 };
 
-// Computed counts
+/* Computed counts */
 const totalDevices = computed(() => bulbs.value.length);
 const totalOn = computed(() => bulbs.value.filter((d) => d.ac_voltage > 190).length);
 const totalOff = computed(() => bulbs.value.filter((d) => d.ac_voltage < 190).length);
 
-// Map
+/* Map */
 const map = ref(null);
 const markersLayer = ref(null);
 
@@ -445,7 +444,7 @@ const updateMapMarkers = (data) => {
   });
 };
 
-// Interactions
+/* Interactions */
 const prefersReducedMotion = ref(false);
 
 const tiltEnter = (e) => {
@@ -493,8 +492,6 @@ const magnetLeave = (e) => {
 
 onMounted(() => {
   prefersReducedMotion.value = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  // ✅ capture ensures outside click closes reliably
   document.addEventListener("click", onDocClick, true);
 
   initializeMap();
@@ -511,8 +508,8 @@ onMounted(() => {
     const logsData = snapshot.val() || {};
     for (let id in logsData) {
       try {
-        const correctedData = logsData[id].replace(/'/g, '"');
-        logs.value.push({ id, ...JSON.parse(correctedData) });
+        const corrected = logsData[id].replace(/'/g, '"');
+        logs.value.push({ id, ...JSON.parse(corrected) });
       } catch {}
     }
     logs.value.sort((a, b) => new Date(b.time) - new Date(a.time));
@@ -526,13 +523,15 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.page-container {
-  max-width: 1280px;
+/* ✅ Wider dashboard control */
+.wrap {
+  --wrap-max: 1440px; /* change to 1600px or 100% for ultra-wide */
+  max-width: var(--wrap-max);
   margin: 0 auto;
-  padding: 18px;
+  padding: 18px 22px;
 }
 
-/* Page background */
+/* Background */
 .dashboard-wrap {
   min-height: 100vh;
   padding-bottom: 28px;
@@ -541,7 +540,22 @@ onUnmounted(() => {
     radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
 }
 
-/* Header block */
+/* ✅ Top layout alignment */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+@media (max-width: 576px) {
+  .topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* Header */
 .header-block {
   padding: 10px 12px;
   border-radius: 16px;
@@ -557,6 +571,7 @@ onUnmounted(() => {
   font-weight: 800;
   box-shadow: 0 18px 45px rgba(109, 40, 217, 0.22);
   transition: 220ms ease;
+  white-space: nowrap;
 }
 .btn-add:hover {
   transform: translateY(-2px);
@@ -574,12 +589,18 @@ onUnmounted(() => {
   backdrop-filter: blur(14px);
   border-radius: 18px;
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22);
-  /* IMPORTANT: allow menus to escape if needed */
   overflow: visible;
 }
 .panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
   padding: 14px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+.panel-body {
+  padding: 14px 16px 16px;
 }
 
 /* Stat cards */
@@ -620,7 +641,7 @@ onUnmounted(() => {
   border-color: rgba(239, 68, 68, 0.25);
 }
 
-/* Soft badges */
+/* Badges */
 .badge-soft {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -639,11 +660,10 @@ onUnmounted(() => {
   box-shadow: 0 18px 70px rgba(0, 0, 0, 0.20);
   transition: 260ms ease;
   min-height: 300px;
-  /* ✅ IMPORTANT: menu MUST not be clipped */
   overflow: visible !important;
 }
 
-/* Kebab */
+/* Kebab + menu */
 .btn-kebab {
   width: 40px;
   height: 40px;
@@ -652,26 +672,21 @@ onUnmounted(() => {
   border: 1px solid rgba(255, 255, 255, 0.10);
   color: rgba(255, 255, 255, 0.85);
 }
-.btn-kebab:hover {
-  background: rgba(255, 255, 255, 0.10);
-}
-
-/* ✅ Custom menu */
 .menu-wrap {
   position: relative;
-  z-index: 1000;
+  z-index: 2000;
 }
 .menu-panel {
   position: absolute;
   top: 44px;
   right: 0;
-  width: 160px;
+  width: 168px;
   background: rgba(15, 23, 42, 0.92);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 14px;
   overflow: hidden;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
-  z-index: 9999 !important;
+  z-index: 9999;
 }
 .menu-item {
   width: 100%;
@@ -709,7 +724,6 @@ onUnmounted(() => {
   filter: blur(18px);
   opacity: 0.75;
   z-index: 1;
-  transition: 240ms ease;
 }
 .is-on {
   color: #facc15;
@@ -762,10 +776,10 @@ onUnmounted(() => {
 
 /* Log */
 .log-panel {
-  max-height: 520px;
+  max-height: 560px;
 }
 .log-list {
-  max-height: 460px;
+  max-height: 470px;
   overflow: auto;
 }
 .log-item {
@@ -809,52 +823,6 @@ onUnmounted(() => {
   border-radius: 18px;
 }
 
-/* Vue modal */
-.v-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(4px);
-  z-index: 999;
-}
-.v-modal {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  z-index: 1000;
-  padding: 16px;
-}
-.v-modal-dialog {
-  width: min(520px, 100%);
-  border-radius: 18px;
-  overflow: hidden;
-  animation: popIn 180ms ease;
-}
-@keyframes popIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-.modal-glass {
-  background: rgba(15, 23, 42, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(18px);
-}
-.form-dark {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #fff !important;
-}
-.form-dark::placeholder {
-  color: rgba(255, 255, 255, 0.45);
-}
-
 /* Spotlight + Tilt */
 .spotlight {
   --x: -200px;
@@ -873,8 +841,116 @@ onUnmounted(() => {
 .spotlight:hover::after {
   opacity: 1;
 }
-.tilt {
-  transform-style: preserve-3d;
-  will-change: transform;
+
+/* ✅ Modal */
+.v-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+}
+.v-modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+  padding: 18px;
+}
+.v-modal-dialog {
+  width: min(720px, 96vw); /* ✅ wider modal */
+  border-radius: 18px;
+  overflow: hidden;
+  animation: popIn 180ms ease;
+}
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.modal-glass {
+  background: rgba(15, 23, 42, 0.80);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+/* ✅ Modal header aligned */
+.v-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 18px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+}
+.v-modal-title {
+  color: white;
+  font-weight: 900;
+  font-size: 22px;
+  line-height: 1.1;
+}
+.v-modal-sub {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  margin-top: 4px;
+}
+.xbtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.85);
+  display: grid;
+  place-items: center;
+}
+.xbtn:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.v-modal-body {
+  padding: 14px 18px 18px;
+}
+
+/* ✅ Modal form layout */
+.grid-1 {
+  display: grid;
+  gap: 12px;
+}
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 576px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.field .label {
+  display: block;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.control {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  outline: none;
+}
+.control:focus {
+  border-color: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.18);
 }
 </style>
