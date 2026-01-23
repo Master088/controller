@@ -34,14 +34,12 @@ export default {
   },
 };
 </script>
- 
+
 <style scoped>
 /* Full dark gradient background */
 .default-layout {
   min-height: 100vh;
-  background: radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 80% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
-    radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
+  background: linear-gradient(135deg, #0f1117, #1a1f2b, #222839);
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -62,8 +60,8 @@ main {
 
 /* Footer gradient */
 .footer-gradient {
-  background: linear-gradient(145deg, rgba(26, 30, 43, 0.8), rgba(44, 62, 80, 0.8));
-  border-radius: 12px 12px 0 0;
+  background: linear-gradient(135deg, #0f1117, #1a1f2b, #222839);
+
 }
 
 /* Links hover */
