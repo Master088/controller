@@ -55,7 +55,7 @@ export default {
 /* Main area padding */
 main {
   flex: 1;
-  padding: 20px;
+  /* padding: 20px; */
 }
 
 /* Footer gradient */
