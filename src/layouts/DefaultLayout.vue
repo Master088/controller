@@ -11,11 +11,11 @@
         <div class="container">
           <hr class="my-4 border-gray-700" />
           <span class="d-block text-center small">
-            © 2024
+            © 2026
             <a
               href="https://flowbite.com/"
               class="text-decoration-none text-white hover-underline"
-              >RNC SMART LIGHT CONTROL AND MONITORING™</a
+              >SMART LIGHT CONTROL AND MONITORING™</a
             >. All Rights Reserved.
           </span>
         </div>
