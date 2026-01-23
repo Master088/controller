@@ -34,12 +34,14 @@ export default {
   },
 };
 </script>
-
+ 
 <style scoped>
 /* Full dark gradient background */
 .default-layout {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0f1117, #1a1f2b, #222839);
+  background: radial-gradient(900px 500px at 10% 10%, rgba(99, 102, 241, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 80% 20%, rgba(168, 85, 247, 0.18), transparent 60%),
+    radial-gradient(900px 500px at 30% 90%, rgba(34, 211, 238, 0.10), transparent 55%);
   color: #fff;
   display: flex;
   flex-direction: column;
